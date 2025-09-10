@@ -4,10 +4,10 @@ import {
   TableCell,
   TableHeader,
   TableRow,
-} from "../../ui/table";
+} from "../../components/ui/table";
 
-import Badge from "../../ui/badge/Badge";
-import { DeleteUserIcon, EditUserIcon } from "../../../icons";
+import Badge from "../../components/ui/badge/Badge";
+import { DeleteUserIcon, EditUserIcon } from "../../icons";
 
 interface Order {
   id: number;
@@ -129,7 +129,7 @@ const tableData: Order[] = [
   },
 ];
 
-export default function BasicTableOne() {
+export default function QuanLyNguoiDungTable() {
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">

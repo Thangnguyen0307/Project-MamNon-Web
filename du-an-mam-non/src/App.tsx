@@ -19,6 +19,7 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+import QuanLyNguoiDung from "./pages/GiaoVu/QuanLyNguoiDung";
 
 export default function App() {
   return (
@@ -29,6 +30,11 @@ export default function App() {
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
             <Route index path="/" element={<Home />} />
+
+            {/* Giáo Vụ */}
+            <Route path="/gvquanlynguoidung" element={<QuanLyNguoiDung />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/blank" element={<Blank />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
