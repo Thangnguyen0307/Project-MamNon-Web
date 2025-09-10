@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 import SignIn from "./pages/AuthPages/SignIn";
-import UserManagement from "./pages/UserManagement";
+import UserManagement from "./pages/QuanLyGiaoVien/UserManagement";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";

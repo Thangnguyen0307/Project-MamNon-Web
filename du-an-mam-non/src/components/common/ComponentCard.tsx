@@ -1,5 +1,5 @@
 interface ComponentCardProps {
-  title: string;
+  title: React.ReactNode;
   button?: React.ReactNode;
   children: React.ReactNode;
   className?: string; // Additional custom classes for styling
