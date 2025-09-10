@@ -14,6 +14,7 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  UserIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
@@ -41,6 +42,11 @@ const navItems: NavItem[] = [
     name: "User Profile",
     path: "/profile",
   },
+    {
+      icon: <UserIcon />,
+      name: "Quản lý giáo viên",
+      path: "/user-management",
+    },
   {
     name: "Forms",
     icon: <ListIcon />,
