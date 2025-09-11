@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { DeleteUserIcon, EditUserIcon } from "../../icons";
+import Pagination from "../../components/common/Pagination";
 
 interface Teacher {
   userid: string;
@@ -122,6 +123,8 @@ const ClassManagementTable: React.FC = () => {
             ))}
           </TableBody>
         </Table>
+        {/* Pagination */}
+        <Pagination total={20} />
       </div>
     </div>
   );

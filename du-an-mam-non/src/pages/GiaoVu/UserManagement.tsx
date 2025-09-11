@@ -6,6 +6,7 @@ import Button from "../../components/ui/button/Button";
 import UserManagementTable from "./UserManagementTable";
 import { Modal } from "../../components/ui/modal";
 import { useModal } from "../../hooks/useModal";
+import UserManagementFilter from "./UserManagementFilter";
 
 const UserManagement = () => {
   const { isOpen, openModal, closeModal } = useModal();
@@ -28,8 +29,9 @@ const UserManagement = () => {
       <PageBreadcrumb pageTitle="Giáo Vụ Quản Lý Người Dùng" />
       <div className="space-y-6">
         <ComponentCard
-          title="Danh Sách Người Dùng"
-          button={<Button onClick={openModal}>Thêm Giáo Viên</Button>}>
+          title="Danh sách người dùng"
+          button={<Button onClick={openModal}>Thêm giáo viên</Button>}
+          filter={<UserManagementFilter />}>
           <UserManagementTable />
         </ComponentCard>
         <Modal

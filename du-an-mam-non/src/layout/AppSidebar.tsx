@@ -38,6 +38,11 @@ const navItems: NavItem[] = [
     path: "/gvuquanlynguoidung",
   },
   {
+    icon: <UserIcon />,
+    name: "Quản lý hoạt động",
+    path: "/gvquanlyhoatdong",
+  },
+  {
     icon: <GridIcon />,
     name: "Dashboard",
     subItems: [{ name: "Ecommerce", path: "/", pro: false }],
