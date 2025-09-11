@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 export const usePagination = (
   totalItems: number,
@@ -7,15 +7,9 @@ export const usePagination = (
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const start = useMemo(
-    () => (currentPage - 1) * itemsPerPage + 1,
-    [currentPage, itemsPerPage]
-  );
+  const start = (currentPage - 1) * itemsPerPage + 1;
 
-  const end = useMemo(
-    () => Math.min(currentPage * itemsPerPage, totalItems),
-    [currentPage, itemsPerPage, totalItems]
-  );
+  const end = Math.min(currentPage * itemsPerPage, totalItems);
 
   const goToPage = useCallback(
     (page: number) => {
