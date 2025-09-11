@@ -28,13 +28,14 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    icon: <GridIcon />,
-    name: "Giáo Vụ",
-    subItems: [
-      { name: "Thao Tác", path: "", pro: false },
-      { name: "Quản Lý Người Dùng", path: "/gvquanlynguoidung", pro: false },
-      { name: "Báo Cáo", path: "", pro: false },
-    ],
+    icon: <UserIcon />,
+    name: "Quản lý lop học",
+    path: "/gvuquanlylophoc",
+  },
+  {
+    icon: <UserIcon />,
+    name: "Quản lý người dùng",
+    path: "/gvuquanlynguoidung",
   },
   {
     icon: <GridIcon />,
@@ -51,11 +52,6 @@ const navItems: NavItem[] = [
     name: "User Profile",
     path: "/profile",
   },
-    {
-      icon: <UserIcon />,
-      name: "Quản lý giáo viên",
-      path: "/user-management",
-    },
   {
     name: "Forms",
     icon: <ListIcon />,

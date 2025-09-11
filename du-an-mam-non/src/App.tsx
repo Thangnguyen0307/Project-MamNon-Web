@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 import SignIn from "./pages/AuthPages/SignIn";
-import UserManagement from "./pages/QuanLyGiaoVien/UserManagement";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
@@ -19,7 +18,8 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
-import QuanLyNguoiDung from "./pages/GiaoVu/QuanLyNguoiDung";
+import UserManagement from "./pages/GiaoVu/UserManagement";
+import ClassManagement from "./pages/GiaoVu/ClassManagement";
 
 export default function App() {
   return (
@@ -32,7 +32,8 @@ export default function App() {
             <Route index path="/" element={<Home />} />
 
             {/* Giáo Vụ */}
-            <Route path="/gvquanlynguoidung" element={<QuanLyNguoiDung />} />
+            <Route path="/gvuquanlynguoidung" element={<UserManagement />} />
+            <Route path="/gvuquanlylophoc" element={<ClassManagement />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/blank" element={<Blank />} />
 
@@ -40,7 +41,6 @@ export default function App() {
             <Route path="/profile" element={<UserProfiles />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/blank" element={<Blank />} />
-            <Route path="/user-management" element={<UserManagement />} />
 
             {/* Forms */}
             <Route path="/form-elements" element={<FormElements />} />
