@@ -5,13 +5,11 @@ import PageMeta from "../../components/common/PageMeta";
 import Button from "../../components/ui/button/Button";
 import UserManagementTable from "./UserManagementTable";
 import { Modal } from "../../components/ui/modal";
+import { useModal } from "../../hooks/useModal";
 
 const UserManagement = () => {
-  const [showModal, setShowModal] = useState(false);
+  const { isOpen, openModal, closeModal } = useModal();
   const [form, setForm] = useState({ userid: "", password: "", full_name: "" });
-
-  const handleOpenModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,7 +18,7 @@ const UserManagement = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Thêm logic thêm giáo viên vào bảng
-    setShowModal(false);
+    closeModal();
     setForm({ userid: "", password: "", full_name: "" });
   };
 
@@ -31,12 +29,12 @@ const UserManagement = () => {
       <div className="space-y-6">
         <ComponentCard
           title="Danh Sách Người Dùng"
-          button={<Button onClick={handleOpenModal}>Thêm Giáo Viên</Button>}>
+          button={<Button onClick={openModal}>Thêm Giáo Viên</Button>}>
           <UserManagementTable />
         </ComponentCard>
         <Modal
-          isOpen={showModal}
-          onClose={handleCloseModal}
+          isOpen={isOpen}
+          onClose={closeModal}
           className="max-w-[500px] m-4">
           <div className="relative w-full p-4 overflow-y-auto bg-white rounded-3xl dark:bg-gray-900 lg:p-8">
             <div className="px-2 pr-14">
@@ -96,7 +94,7 @@ const UserManagement = () => {
                   size="sm"
                   variant="outline"
                   type="button"
-                  onClick={handleCloseModal}>
+                  onClick={closeModal}>
                   Hủy
                 </Button>
                 <Button
