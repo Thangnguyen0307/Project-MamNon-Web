@@ -1,7 +1,7 @@
 import DatePicker from "../../components/form/date-picker";
 import Filter from "../../components/ui/filter";
 
-const ClassManagementFilter = () => {
+const GradeManagementFilter = () => {
   return (
     <Filter>
       <DatePicker
@@ -17,4 +17,4 @@ const ClassManagementFilter = () => {
   );
 };
 
-export default ClassManagementFilter;
+export default GradeManagementFilter;

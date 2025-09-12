@@ -46,8 +46,7 @@ export default function DefaultInputs() {
             />
             <button
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
-            >
+              className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2">
               {showPassword ? (
                 <EyeIcon className="fill-gray-500 dark:fill-gray-400 size-5" />
               ) : (
@@ -66,6 +65,7 @@ export default function DefaultInputs() {
               // Handle your logic
               console.log({ dates, currentDateString });
             }}
+            type="Y-m-d"
           />
         </div>
 
@@ -97,8 +97,7 @@ export default function DefaultInputs() {
                 height="20"
                 viewBox="0 0 20 20"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+                xmlns="http://www.w3.org/2000/svg">
                 <circle cx="6.25" cy="10" r="5.625" fill="#E80B26" />
                 <circle cx="13.75" cy="10" r="5.625" fill="#F59D31" />
                 <path

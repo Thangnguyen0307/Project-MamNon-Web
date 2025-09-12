@@ -21,6 +21,7 @@ import Home from "./pages/Dashboard/Home";
 import UserManagement from "./pages/GiaoVu/UserManagement";
 import ClassManagement from "./pages/GiaoVu/ClassManagement";
 import ActivityManagement from "./pages/GiaoVien/ActivityManagement";
+import GradeManagement from "./pages/GiaoVu/GradeManagement";
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
             {/* Giáo Vụ */}
             <Route path="/gvuquanlynguoidung" element={<UserManagement />} />
             <Route path="/gvuquanlylophoc" element={<ClassManagement />} />
+            <Route path="/gvuquanlykhoilop" element={<GradeManagement />} />
 
             {/* Giáo Viên */}
             <Route path="/gvquanlyhoatdong" element={<ActivityManagement />} />

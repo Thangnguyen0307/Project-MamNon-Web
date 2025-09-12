@@ -39,6 +39,11 @@ const navItems: NavItem[] = [
   },
   {
     icon: <UserIcon />,
+    name: "Quản lý khối lớp học",
+    path: "/gvuquanlykhoilop",
+  },
+  {
+    icon: <UserIcon />,
     name: "Quản lý hoạt động",
     path: "/gvquanlyhoatdong",
   },

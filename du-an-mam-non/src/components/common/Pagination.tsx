@@ -7,8 +7,16 @@ interface ModalProps {
 }
 
 const Pagination: React.FC<ModalProps> = ({ total, limit = 10 }) => {
-  const { currentPage, totalPages, start, end, goToPage, nextPage, prevPage } =
-    usePagination(total, limit);
+  const {
+    currentPage,
+    totalPages,
+    start,
+    end,
+    goToPage,
+    nextPage,
+    prevPage,
+    totalItems,
+  } = usePagination(total, limit);
 
   return (
     <>
@@ -22,7 +30,7 @@ const Pagination: React.FC<ModalProps> = ({ total, limit = 10 }) => {
             of
             <span className="text-gray-800 dark:text-white/90">
               {" "}
-              {totalPages}
+              {totalItems}
             </span>
           </span>
         </div>

@@ -36,5 +36,6 @@ export const usePagination = (
     goToPage,
     nextPage,
     prevPage,
+    totalItems,
   };
 };
