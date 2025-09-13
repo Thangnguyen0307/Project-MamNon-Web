@@ -8,6 +8,7 @@ import Button from "../ui/button/Button";
 import { validateEmail } from "../../utils/helper";
 import { API_PATHS } from "../../utils/apiPaths";
 import { axiosInstance } from "../../utils/axiosInstance";
+import { useUser } from "../../context/UserContext";
 
 export default function SignInForm() {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ export default function SignInForm() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-
+  const { updateUser } = useUser();
   // Call API LOGIN
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,9 +39,10 @@ export default function SignInForm() {
         password,
       });
 
-      const { accessToken, refreshToken } = response.data;
+      const { accessToken, refreshToken, data } = response.data;
 
       if (accessToken) {
+        updateUser(data);
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
       }

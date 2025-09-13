@@ -12,4 +12,12 @@ export const API_PATHS = {
   ADMIN: {
     CREATE_ACCOUNT: "api/admins/create-account",
   },
+  USER: {
+    GET_ALL_USERS: "api/user",
+    GET_USER_INFO: (id: string) => `api/user/${id}`,
+    UPDATE_USER: (id: string) => `api/user/${id}`,
+    DELETE_USER: (id: string) => `api/user/${id}`,
+    CHANGE_STATUS: (id: string) => `api/user/${id}/status`,
+    CHANGE_ROLE: (id: string) => `api/user/${id}/role`,
+  },
 };

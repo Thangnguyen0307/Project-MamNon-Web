@@ -22,6 +22,8 @@ import UserManagement from "./pages/GiaoVu/UserManagement";
 import ClassManagement from "./pages/GiaoVu/ClassManagement";
 import ActivityManagement from "./pages/GiaoVien/ActivityManagement";
 import GradeManagement from "./pages/GiaoVu/GradeManagement";
+import ProtectedRoute from "./components/common/ProtectedRoute";
+import PublicRoute from "./components/common/PublicRoute";
 
 export default function App() {
   return (
@@ -30,48 +32,54 @@ export default function App() {
         <ScrollToTop />
         <Routes>
           {/* Dashboard Layout */}
-          <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<AppLayout />}>
+              <Route index path="/" element={<Home />} />
 
-            {/* Giáo Vụ */}
-            <Route path="/gvuquanlynguoidung" element={<UserManagement />} />
-            <Route path="/gvuquanlylophoc" element={<ClassManagement />} />
-            <Route path="/gvuquanlykhoilop" element={<GradeManagement />} />
+              {/* Giáo Vụ */}
+              <Route path="/gvuquanlynguoidung" element={<UserManagement />} />
+              <Route path="/gvuquanlylophoc" element={<ClassManagement />} />
+              <Route path="/gvuquanlykhoilop" element={<GradeManagement />} />
 
-            {/* Giáo Viên */}
-            <Route path="/gvquanlyhoatdong" element={<ActivityManagement />} />
+              {/* Giáo Viên */}
+              <Route
+                path="/gvquanlyhoatdong"
+                element={<ActivityManagement />}
+              />
 
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/blank" element={<Blank />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/blank" element={<Blank />} />
 
-            {/* Others Page */}
-            <Route path="/profile" element={<UserProfiles />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/blank" element={<Blank />} />
+              {/* Others Page */}
+              <Route path="/profile" element={<UserProfiles />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/blank" element={<Blank />} />
 
-            {/* Forms */}
-            <Route path="/form-elements" element={<FormElements />} />
+              {/* Forms */}
+              <Route path="/form-elements" element={<FormElements />} />
 
-            {/* Tables */}
-            <Route path="/basic-tables" element={<BasicTables />} />
+              {/* Tables */}
+              <Route path="/basic-tables" element={<BasicTables />} />
 
-            {/* Ui Elements */}
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/avatars" element={<Avatars />} />
-            <Route path="/badge" element={<Badges />} />
-            <Route path="/buttons" element={<Buttons />} />
-            <Route path="/images" element={<Images />} />
-            <Route path="/videos" element={<Videos />} />
+              {/* Ui Elements */}
+              <Route path="/alerts" element={<Alerts />} />
+              <Route path="/avatars" element={<Avatars />} />
+              <Route path="/badge" element={<Badges />} />
+              <Route path="/buttons" element={<Buttons />} />
+              <Route path="/images" element={<Images />} />
+              <Route path="/videos" element={<Videos />} />
 
-            {/* Charts */}
-            <Route path="/line-chart" element={<LineChart />} />
-            <Route path="/bar-chart" element={<BarChart />} />
+              {/* Charts */}
+              <Route path="/line-chart" element={<LineChart />} />
+              <Route path="/bar-chart" element={<BarChart />} />
+            </Route>
           </Route>
 
           {/* Auth Layout */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-
+          <Route element={<PublicRoute />}>
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+          </Route>
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
