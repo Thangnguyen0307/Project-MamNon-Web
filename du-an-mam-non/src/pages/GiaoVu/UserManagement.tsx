@@ -7,20 +7,66 @@ import UserManagementTable from "./UserManagementTable";
 import { Modal } from "../../components/ui/modal";
 import { useModal } from "../../hooks/useModal";
 import UserManagementFilter from "./UserManagementFilter";
+import Input from "../../components/form/input/InputField";
+import Label from "../../components/form/Label";
+import Select from "../../components/form/Select";
+import { axiosInstance } from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths";
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
 
 const UserManagement = () => {
   const { isOpen, openModal, closeModal } = useModal();
-  const [form, setForm] = useState({ userid: "", password: "", full_name: "" });
+  const role = [
+    { value: "ADMIN", label: "Admin" },
+    { value: "TEACHER", label: "Teacher" },
+  ];
+  const [userData, setUserData] = useState({
+    email: "",
+    role: "",
+    error: "",
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const clearData = () => {
+    setUserData({
+      email: "",
+      role: "",
+      error: "",
+    });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleValueChange = (key: string, value: string) => {
+    setUserData((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+  console.log(userData);
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Thêm logic thêm giáo viên vào bảng
     closeModal();
-    setForm({ userid: "", password: "", full_name: "" });
+    try {
+      const response = await axiosInstance.post(
+        API_PATHS.ADMIN.CREATE_ACCOUNT,
+        {
+          email: userData.email,
+          role: userData.role,
+        }
+      );
+
+      if (response) {
+        toast.success("Tạo tài khoản thành công");
+        clearData();
+      }
+
+      console.log(response.data);
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      if (error.response && error.response.data.message) {
+        toast.error(error.response.data.message);
+      }
+    }
   };
 
   return (
@@ -38,55 +84,36 @@ const UserManagement = () => {
           isOpen={isOpen}
           onClose={closeModal}
           className="max-w-[500px] m-4">
-          <div className="relative w-full p-4 overflow-y-auto bg-white rounded-3xl dark:bg-gray-900 lg:p-8">
+          <div className="no-scrollbar relative w-full max-w-[500px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
             <div className="px-2 pr-14">
               <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90 text-center">
                 Đăng ký giáo viên mới
               </h4>
             </div>
             <form className="flex flex-col" onSubmit={handleSubmit}>
-              <div className="px-2">
-                <div className="grid grid-cols-1 gap-y-5">
+              <div className="custom-scrollbar overflow-y-auto px-2 pb-3">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-5">
                   <div>
-                    <label className="block mb-1 font-medium text-gray-700">
-                      UserID
-                    </label>
-                    <input
-                      name="userid"
+                    <Label>Email</Label>
+                    <Input
+                      name="email"
                       type="text"
-                      placeholder="UserID"
-                      value={form.userid}
-                      onChange={handleChange}
+                      placeholder="Vui lòng nhập email"
+                      onChange={({ target }) => {
+                        handleValueChange(target.name, target.value);
+                      }}
                       className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      required
+                      required={true}
                     />
                   </div>
                   <div>
-                    <label className="block mb-1 font-medium text-gray-700">
-                      Mật khẩu
-                    </label>
-                    <input
-                      name="password"
-                      type="password"
-                      placeholder="Mật khẩu"
-                      value={form.password}
-                      onChange={handleChange}
-                      className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-1 font-medium text-gray-700">
-                      Họ tên
-                    </label>
-                    <input
-                      name="full_name"
-                      type="text"
-                      placeholder="Họ tên"
-                      value={form.full_name}
-                      onChange={handleChange}
-                      className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      required
+                    <Label>Role</Label>
+                    <Select
+                      name="role"
+                      options={role}
+                      placeholder="Vui lòng chọn role người dùng"
+                      onChange={(name, value) => handleValueChange(name, value)}
+                      className="dark:bg-dark-900  "
                     />
                   </div>
                 </div>

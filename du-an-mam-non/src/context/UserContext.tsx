@@ -50,13 +50,13 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const fetchUser = async () => {
       try {
         const response = await axiosInstance.get<User>(
-          API_PATHS.USER.GET_USER_INFO("68c3896a536522aa52126ef9")
+          API_PATHS.USER.GET_USER_INFO
         );
         if (isMounted && response.data) {
           updateUser(response.data);
         }
       } catch (err) {
-        console.error("Failed to fetch user", err);
+        console.error("Failed to fetch user info", err);
         if (isMounted) {
           clearUser();
         }

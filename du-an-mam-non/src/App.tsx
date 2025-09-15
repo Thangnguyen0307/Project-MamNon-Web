@@ -24,6 +24,7 @@ import ActivityManagement from "./pages/GiaoVien/ActivityManagement";
 import GradeManagement from "./pages/GiaoVu/GradeManagement";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import PublicRoute from "./components/common/PublicRoute";
+import { Toaster } from "react-hot-toast";
 
 export default function App() {
   return (
@@ -84,6 +85,13 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          className: "",
+          style: { fontSize: "13px" },
+        }}
+      />
     </>
   );
 }

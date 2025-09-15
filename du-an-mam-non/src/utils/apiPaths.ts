@@ -14,7 +14,7 @@ export const API_PATHS = {
   },
   USER: {
     GET_ALL_USERS: "api/user",
-    GET_USER_INFO: (id: string) => `api/user/${id}`,
+    GET_USER_INFO: "api/user/my-info",
     UPDATE_USER: (id: string) => `api/user/${id}`,
     DELETE_USER: (id: string) => `api/user/${id}`,
     CHANGE_STATUS: (id: string) => `api/user/${id}/status`,
