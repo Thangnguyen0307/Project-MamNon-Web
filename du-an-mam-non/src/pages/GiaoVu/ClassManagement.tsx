@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ComponentCard from "../../components/common/ComponentCard";
 import Button from "../../components/ui/button/Button";
 import ClassManagementTable from "./ClassManagementTable";
@@ -10,13 +10,47 @@ import Label from "../../components/form/Label";
 import { useModal } from "../../hooks/useModal";
 import { Modal } from "../../components/ui/modal";
 
+const API_URL = "/api/classes";
+
+const defaultNewClass = {
+  name: "",
+  level: "",
+  teachers: [],
+  schoolYear: "",
+};
+
 const ClassManagement: React.FC = () => {
   const { isOpen, openModal, closeModal } = useModal();
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
-    closeModal();
+  const [classes, setClasses] = useState<any[]>([]);
+  const [newClass, setNewClass] = useState(defaultNewClass);
+  const [loading, setLoading] = useState(false);
+
+  // Call API tạo lớp học mới
+  const handleSave = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newClass),
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        setClasses((prev) => [...prev, result.data]);
+        closeModal();
+        setNewClass(defaultNewClass);
+        alert(result.message || "Tạo lớp học thành công!");
+      } else {
+        alert(result.message || "Tạo lớp học thất bại!");
+      }
+    } catch (err) {
+      alert("Có lỗi xảy ra khi tạo lớp học!");
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <>
       <PageMeta title="Quan Ly Mam Non" description="Quan Ly Mam Non" />
@@ -26,7 +60,7 @@ const ClassManagement: React.FC = () => {
           title="Danh sách lớp học"
           button={<Button onClick={openModal}>Thêm lớp học</Button>}
           filter={<ClassManagementFilter />}>
-          <ClassManagementTable />
+          <ClassManagementTable classes={classes} />
         </ComponentCard>
         <Modal
           isOpen={isOpen}
@@ -35,89 +69,76 @@ const ClassManagement: React.FC = () => {
           <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
             <div className="px-2 pr-14">
               <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-                Edit Personal Information
+                Thêm lớp học mới
               </h4>
-              <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-                Update your details to keep your profile up-to-date.
-              </p>
             </div>
-            <form className="flex flex-col">
-              <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-                <div>
-                  <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                    Social Links
-                  </h5>
-
-                  <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                    <div>
-                      <Label>Facebook</Label>
-                      <Input
-                        type="text"
-                        value="https://www.facebook.com/PimjoHQ"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>X.com</Label>
-                      <Input type="text" value="https://x.com/PimjoHQ" />
-                    </div>
-
-                    <div>
-                      <Label>Linkedin</Label>
-                      <Input
-                        type="text"
-                        value="https://www.linkedin.com/company/pimjo"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Instagram</Label>
-                      <Input
-                        type="text"
-                        value="https://instagram.com/PimjoHQ"
-                      />
-                    </div>
+            <form className="flex flex-col" onSubmit={handleSave}>
+              <div className="custom-scrollbar h-[350px] overflow-y-auto px-2 pb-3">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+                  <div>
+                    <Label>Tên lớp học</Label>
+                    <Input
+                      type="text"
+                      value={newClass.name}
+                      onChange={(e) =>
+                        setNewClass({ ...newClass, name: e.target.value })
+                      }
+                      required
+                    />
                   </div>
-                </div>
-                <div className="mt-7">
-                  <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                    Personal Information
-                  </h5>
-
-                  <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                    <div className="col-span-2 lg:col-span-1">
-                      <Label>First Name</Label>
-                      <Input type="text" value="Musharof" />
-                    </div>
-
-                    <div className="col-span-2 lg:col-span-1">
-                      <Label>Last Name</Label>
-                      <Input type="text" value="Chowdhury" />
-                    </div>
-
-                    <div className="col-span-2 lg:col-span-1">
-                      <Label>Email Address</Label>
-                      <Input type="text" value="randomuser@pimjo.com" />
-                    </div>
-
-                    <div className="col-span-2 lg:col-span-1">
-                      <Label>Phone</Label>
-                      <Input type="text" value="+09 363 398 46" />
-                    </div>
-
-                    <div className="col-span-2">
-                      <Label>Bio</Label>
-                      <Input type="text" value="Team Manager" />
-                    </div>
+                  <div>
+                    <Label>Khối lớp (level)</Label>
+                    <Input
+                      type="text"
+                      value={newClass.level}
+                      onChange={(e) =>
+                        setNewClass({ ...newClass, level: e.target.value })
+                      }
+                      required
+                      placeholder="Nhập hoặc chọn ID khối lớp"
+                    />
+                  </div>
+                  <div>
+                    <Label>Giáo viên (ID, cách nhau dấu phẩy)</Label>
+                    <Input
+                      type="text"
+                      value={newClass.teachers.join(",")}
+                      onChange={(e) =>
+                        setNewClass({
+                          ...newClass,
+                          teachers: e.target.value
+                            .split(",")
+                            .map((id) => id.trim())
+                            .filter((id) => id),
+                        })
+                      }
+                      placeholder="Ví dụ: id1,id2"
+                    />
+                  </div>
+                  <div>
+                    <Label>Năm học (schoolYear)</Label>
+                    <Input
+                      type="text"
+                      value={newClass.schoolYear}
+                      onChange={(e) =>
+                        setNewClass({ ...newClass, schoolYear: e.target.value })
+                      }
+                      required
+                    />
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-                <Button size="sm" variant="outline" onClick={closeModal}>
-                  Close
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={closeModal}
+                  type="button"
+                  disabled={loading}>
+                  Đóng
                 </Button>
-                <Button size="sm" onClick={handleSave}>
-                  Save Changes
+                <Button size="sm" type="submit" disabled={loading}>
+                  {loading ? "Đang lưu..." : "Thêm lớp học"}
                 </Button>
               </div>
             </form>
