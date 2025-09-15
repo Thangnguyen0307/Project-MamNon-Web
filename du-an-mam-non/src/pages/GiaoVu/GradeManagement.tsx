@@ -20,13 +20,12 @@ const GradeManagement: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [levelsData, setLevelsData] = useState([]);
-
-  const [levelsPram, setLevelsParam] = useState({
+  const defaultLevelsPram = {
     name: "",
     createdAt: "",
     updatedAt: "",
-  });
-  console.log(levelsPram);
+  };
+  const [levelsPram, setLevelsParam] = useState(defaultLevelsPram);
 
   useEffect(() => {
     fetchAllLevels();
@@ -41,6 +40,7 @@ const GradeManagement: React.FC = () => {
 
   const modalCreate = () => {
     setSelectedItem(null);
+    setLevelsParam(defaultLevelsPram);
     openModal();
   };
   const modalUpdate = (id: string) => {
@@ -56,7 +56,6 @@ const GradeManagement: React.FC = () => {
       const response = await axiosInstance.get(API_PATHS.LEVELS.GET_ALL_LEVELS);
 
       if (response.data.data.levels?.length > 0) {
-        toast.success("Lấy dữ liệu khối lợp học thành công");
         setLevelsData(response.data.data.levels);
       }
     } catch (err) {
@@ -113,7 +112,7 @@ const GradeManagement: React.FC = () => {
           }
         );
         if (response) {
-          toast.success("Cập nhật lớp học thành công");
+          toast.success("Cập nhật khối lớp học thành công");
           fetchAllLevels();
         }
       }
@@ -132,7 +131,7 @@ const GradeManagement: React.FC = () => {
         API_PATHS.LEVELS.DELETE_LEVEL(id)
       );
       if (response) {
-        toast.success("Xoá lớp học thành công");
+        toast.success("Xoá khối lớp học thành công");
         fetchAllLevels();
       }
     } catch (err) {
@@ -154,7 +153,7 @@ const GradeManagement: React.FC = () => {
           filter={<GradeManagementFilter />}>
           <GradeManagementTable
             data={levelsData}
-            openModal={modalUpdate}
+            modalUpdate={modalUpdate}
             deleteData={handleDelete}
           />
           <Modal

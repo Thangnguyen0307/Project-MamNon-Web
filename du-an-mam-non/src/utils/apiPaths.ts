@@ -27,4 +27,11 @@ export const API_PATHS = {
     UPDATE_LEVEL: (id: string) => `api/levels/${id}`,
     DELETE_LEVEL: (id: string) => `api/levels/${id}`,
   },
+  CLASSES: {
+    GET_ALL_CLASSES: "api/classes",
+    CREATE_CLASSES: "api/classes",
+    DETAIL_CLASSES: (id: string) => `api/classes/${id}`,
+    UPDATE_CLASSES: (id: string) => `api/classes/${id}`,
+    DELETE_CLASSES: (id: string) => `api/classes/${id}`,
+  },
 };
