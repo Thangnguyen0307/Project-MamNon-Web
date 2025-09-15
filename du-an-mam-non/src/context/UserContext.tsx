@@ -15,12 +15,15 @@ export interface User {
   email: string;
 }
 
+
+
 interface UserContextType {
   user: User | null;
   updateUser: (userData: User) => void;
   clearUser: () => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
+  logout: () => Promise<void>;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(
@@ -33,6 +36,7 @@ interface UserProviderProps {
 
 const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  
   const [loading, setLoading] = useState(true);
   const updateUser = useCallback((userData: User) => {
     setUser(userData);
@@ -42,6 +46,22 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
   }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (refreshToken) {
+        await axiosInstance.post(API_PATHS.AUTH.LOG_OUT, { refreshToken });
+      } else {
+        await axiosInstance.post(API_PATHS.AUTH.LOG_OUT);
+      }
+    } catch (err) {
+      console.warn("Logout API error, clearing tokens anyway.", err);
+    } finally {
+      clearUser();
+    }
+  }, [clearUser]);
+
 
   useEffect(() => {
     if (user) return;
@@ -70,11 +90,11 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     return () => {
       isMounted = false;
     };
-  }, [user]);
+  }, [user, updateUser, clearUser]);
 
   return (
     <UserContext.Provider
-      value={{ user, updateUser, clearUser, loading, setLoading }}>
+      value={{ user, updateUser, clearUser, loading, setLoading, logout }}>
       {children}
     </UserContext.Provider>
   );

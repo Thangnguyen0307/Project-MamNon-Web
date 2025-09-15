@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router";
+import ResetPassword from "./pages/AuthPages/ResetPassword";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -80,6 +81,7 @@ export default function App() {
           <Route element={<PublicRoute />}>
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />
