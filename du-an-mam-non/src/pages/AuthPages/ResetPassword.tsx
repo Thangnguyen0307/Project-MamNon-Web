@@ -1,11 +1,17 @@
+import PageMeta from "../../components/common/PageMeta";
+import AuthLayout from "./AuthPageLayout";
 import ResetPasswordForm from "../../components/auth/ResetPasswordForm";
 
-export default function ResetPassword() {
+export default function ResetPasswordPage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-14">
-      <div className="flex items-center justify-center">
+    <>
+      <PageMeta title="Reset Password" />
+      <AuthLayout
+        title="Đặt lại mật khẩu"
+        subtitle="Nhập email để nhận OTP và đổi mật khẩu"
+      >
         <ResetPasswordForm />
-      </div>
-    </div>
+      </AuthLayout>
+    </>
   );
 }

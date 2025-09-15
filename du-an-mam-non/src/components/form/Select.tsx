@@ -6,7 +6,7 @@ interface Option {
 }
 
 interface SelectProps {
-  name: string;
+  name?: string;
   options: Option[];
   placeholder?: string;
   onChange: (name: string, value: string) => void;
@@ -23,12 +23,12 @@ const Select: React.FC<SelectProps> = ({
   defaultValue = "",
 }) => {
   // Manage the selected value
-  const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
 
+  const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
+  console.log(defaultValue);
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     const name = e.target.name;
-    console.log(name);
 
     setSelectedValue(value);
     onChange(name, value); // Trigger parent handler

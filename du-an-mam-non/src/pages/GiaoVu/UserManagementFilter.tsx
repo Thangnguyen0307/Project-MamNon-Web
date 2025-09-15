@@ -24,8 +24,8 @@ const UserManagementFilter = () => {
         <Select
           options={options}
           placeholder="Select Option"
-          onChange={(value: string) => {
-            console.log("Selected value:", value);
+          onChange={(name, value) => {
+            console.log("Selected value:", value, name);
           }}
           className="dark:bg-dark-900  "
         />

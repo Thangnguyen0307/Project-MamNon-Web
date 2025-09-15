@@ -49,7 +49,7 @@ const tableData: Teacher[] = [
   },
 ];
 
-const ClassManagementTable: React.FC = () => {
+const UserManagementTable: React.FC = () => {
   const [data, setData] = React.useState(tableData);
   const handleDelete = (userid: string) => {
     setData(data.filter((teacher) => teacher.userid !== userid));
@@ -130,4 +130,4 @@ const ClassManagementTable: React.FC = () => {
   );
 };
 
-export default ClassManagementTable;
+export default UserManagementTable;

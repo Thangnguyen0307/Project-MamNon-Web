@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router";
-import ResetPassword from "./pages/AuthPages/ResetPassword";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
+import ResetPasswordPage from "./pages/AuthPages/ResetPassword";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
 import Videos from "./pages/UiElements/Videos";
@@ -81,14 +81,14 @@ export default function App() {
           <Route element={<PublicRoute />}>
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
           </Route>
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
       <Toaster
-        position="top-right"
+        position="bottom-right"
         toastOptions={{
           className: "",
           style: { fontSize: "13px" },

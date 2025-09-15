@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
@@ -11,43 +11,84 @@ import { axiosInstance } from "../../utils/axiosInstance";
 import { useUser } from "../../context/UserContext";
 
 export default function SignInForm() {
+  const navigate = useNavigate();
+  const { updateUser } = useUser();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  const { updateUser } = useUser();
+  const [submitting, setSubmitting] = useState(false);
+
   // Call API LOGIN
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (submitting) return;
 
+    // validate
     if (!validateEmail(email)) {
       setError("Please enter a valid email address");
       return;
     }
-
     if (!password) {
       setError("Please enter the password");
       return;
     }
 
     setError("");
+    setSubmitting(true);
 
     try {
-      const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
+      // 1) LOGIN
+      const res = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
         email,
         password,
       });
 
-      const { accessToken, refreshToken, data } = response.data;
+      // 2) Lấy token & user từ response (đủ “robust” cho nhiều dạng payload)
+      const body: any = res?.data ?? {};
+      const accessToken =
+        body.accessToken || body.access_token || body?.data?.accessToken;
+      const refreshToken =
+        body.refreshToken || body.refresh_token || body?.data?.refreshToken;
 
-      if (accessToken) {
-        updateUser(data);
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
+      // user có thể nằm ở body.data hoặc body.user tuỳ backend
+      const userData = body.user || body?.data?.user || body?.data || null;
+
+      if (!accessToken) {
+        throw new Error("Login succeeded but no accessToken was returned.");
       }
-    } catch (error) {
-      console.log(error);
+
+      // 3) Lưu token trước để các request kế tiếp đính kèm Authorization
+      localStorage.setItem("accessToken", accessToken);
+      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+
+      // 4) Cập nhật context ngay để ProtectedRoute pass
+      if (userData) {
+        updateUser(userData);
+      } else {
+        // fallback: gọi my-account để lấy profile nếu BE không trả user trong login
+        try {
+          const meRes = await axiosInstance.get(API_PATHS.USER.GET_USER_INFO);
+          const mePayload: any = meRes?.data ?? {};
+          const me = mePayload?.data ?? mePayload ?? null;
+          if (me) updateUser(me);
+        } catch {
+          // nếu vẫn không lấy được, cứ điều hướng; interceptor sẽ xử lý nếu token invalid
+        }
+      }
+
+      // 5) Điều hướng về dashboard
+      navigate("/", { replace: true });
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Sign in failed. Please try again.";
+      setError(msg);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -56,11 +97,13 @@ export default function SignInForm() {
       <div className="w-full max-w-md pt-10 mx-auto">
         <Link
           to="/"
-          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+        >
           <ChevronLeftIcon className="size-5" />
           Back to dashboard
         </Link>
       </div>
+
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
           <div className="mb-5 sm:mb-8">
@@ -71,15 +114,12 @@ export default function SignInForm() {
               Enter your email and password to sign in!
             </p>
           </div>
+
           <div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
               <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
+                {/* social button (placeholder) */}
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path
                     d="M18.7511 10.1944C18.7511 9.47495 18.6915 8.94995 18.5626 8.40552H10.1797V11.6527H15.1003C15.0011 12.4597 14.4654 13.675 13.2749 14.4916L13.2582 14.6003L15.9087 16.6126L16.0924 16.6305C17.7788 15.1041 18.7511 12.8583 18.7511 10.1944Z"
                     fill="#4285F4"
@@ -99,19 +139,22 @@ export default function SignInForm() {
                 </svg>
                 Sign in with Google
               </button>
+
               <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
+                {/* social button (placeholder) */}
                 <svg
                   width="21"
                   className="fill-current"
                   height="20"
                   viewBox="0 0 21 20"
                   fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
+                >
                   <path d="M15.6705 1.875H18.4272L12.4047 8.75833L19.4897 18.125H13.9422L9.59717 12.4442L4.62554 18.125H1.86721L8.30887 10.7625L1.51221 1.875H7.20054L11.128 7.0675L15.6705 1.875ZM14.703 16.475H16.2305L6.37054 3.43833H4.73137L14.703 16.475Z" />
                 </svg>
                 Sign in with X
               </button>
             </div>
+
             <div className="relative py-3 sm:py-5">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
@@ -122,6 +165,7 @@ export default function SignInForm() {
                 </span>
               </div>
             </div>
+
             <form onSubmit={handleLogin}>
               <div className="space-y-6">
                 <div>
@@ -134,6 +178,7 @@ export default function SignInForm() {
                     onChange={({ target }) => setEmail(target.value)}
                   />
                 </div>
+
                 <div>
                   <Label>
                     Password <span className="text-error-500">*</span>{" "}
@@ -147,7 +192,8 @@ export default function SignInForm() {
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2">
+                      className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                    >
                       {showPassword ? (
                         <EyeIcon className="fill-gray-500 dark:fill-gray-400 size-5" />
                       ) : (
@@ -156,9 +202,11 @@ export default function SignInForm() {
                     </span>
                   </div>
                 </div>
+
                 {error && (
                   <p className="text-red-500 text-xs pb-2.5">{error}</p>
                 )}
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Checkbox checked={isChecked} onChange={setIsChecked} />
@@ -166,15 +214,23 @@ export default function SignInForm() {
                       Keep me logged in
                     </span>
                   </div>
+
                   <Link
                     to="/reset-password"
-                    className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400">
+                    className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                  >
                     Forgot password?
                   </Link>
                 </div>
+
                 <div>
-                  <Button className="w-full" size="sm" type="submit">
-                    Sign in
+                  <Button
+                    className="w-full"
+                    size="sm"
+                    type="submit"
+                    disabled={submitting}
+                  >
+                    {submitting ? "Signing in..." : "Sign in"}
                   </Button>
                 </div>
               </div>
@@ -182,10 +238,11 @@ export default function SignInForm() {
 
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Don&apos;t have an account? {""}
+                Don&apos;t have an account?{" "}
                 <Link
                   to="/signup"
-                  className="text-brand-500 hover:text-brand-600 dark:text-brand-400">
+                  className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                >
                   Sign Up
                 </Link>
               </p>

@@ -15,20 +15,15 @@ export interface User {
   email: string;
 }
 
-
-
 interface UserContextType {
   user: User | null;
   updateUser: (userData: User) => void;
   clearUser: () => void;
   loading: boolean;
-  setLoading: (loading: boolean) => void;
-  logout: () => Promise<void>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const UserContext = createContext<UserContextType | undefined>(
-  undefined
-);
+export const UserContext = createContext<UserContextType | undefined>(undefined);
 
 interface UserProviderProps {
   children: ReactNode;
@@ -36,65 +31,64 @@ interface UserProviderProps {
 
 const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  
   const [loading, setLoading] = useState(true);
+
   const updateUser = useCallback((userData: User) => {
     setUser(userData);
   }, []);
+
   const clearUser = useCallback(() => {
     setUser(null);
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
   }, []);
 
-  const logout = useCallback(async () => {
-    try {
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (refreshToken) {
-        await axiosInstance.post(API_PATHS.AUTH.LOG_OUT, { refreshToken });
-      } else {
-        await axiosInstance.post(API_PATHS.AUTH.LOG_OUT);
-      }
-    } catch (err) {
-      console.warn("Logout API error, clearing tokens anyway.", err);
-    } finally {
-      clearUser();
-    }
-  }, [clearUser]);
-
-
   useEffect(() => {
-    if (user) return;
-    let isMounted = true;
+    let active = true;
+    const controller = new AbortController();
 
     const fetchUser = async () => {
+      // ❗ Không có token thì không gọi /my-account
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        if (active) {
+          setUser(null);
+          setLoading(false);
+        }
+        return;
+      }
+
       try {
-        const response = await axiosInstance.get<User>(
-          API_PATHS.USER.GET_USER_INFO
-        );
-        if (isMounted && response.data) {
-          updateUser(response.data);
-        }
+        const res = await axiosInstance.get(API_PATHS.USER.GET_USER_INFO, {
+          signal: controller.signal as any, // tránh TS warning nếu cần
+        });
+
+        // Tuỳ BE: có thể trả { data: User } hoặc trả thẳng User
+        const payload: any = res?.data;
+        const userData: User | null = payload?.data ?? payload ?? null;
+
+        if (active && userData) setUser(userData);
       } catch (err) {
-        console.error("Failed to fetch user info", err);
-        if (isMounted) {
-          clearUser();
-        }
+        // 401 sẽ do interceptor xử lý (refresh hoặc clear token). Ở đây chỉ set user null.
+        if (active) setUser(null);
+        // console.debug("Failed to fetch user info", err);
       } finally {
-        if (isMounted) setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
     fetchUser();
 
     return () => {
-      isMounted = false;
+      active = false;
+      controller.abort();
     };
-  }, [user, updateUser, clearUser]);
+  }, []); // chạy 1 lần khi mount; sau login bạn đã gọi updateUser() rồi
 
   return (
     <UserContext.Provider
-      value={{ user, updateUser, clearUser, loading, setLoading, logout }}>
+      value={{ user, updateUser, clearUser, loading, setLoading }}
+    >
       {children}
     </UserContext.Provider>
   );
@@ -105,7 +99,7 @@ export default UserProvider;
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error("useUserContext must be used within a UserProvider");
+    throw new Error("useUser must be used within a UserProvider");
   }
   return context;
 };
