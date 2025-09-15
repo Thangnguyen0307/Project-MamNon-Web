@@ -41,7 +41,6 @@ const GradeManagement: React.FC = () => {
 
   const modalCreate = () => {
     setSelectedItem(null);
-
     openModal();
   };
   const modalUpdate = (id: string) => {
@@ -117,6 +116,7 @@ const GradeManagement: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
+    setSelectedItem(id);
     try {
       const response = await axiosInstance.delete(
         API_PATHS.LEVELS.DELETE_LEVEL(id)

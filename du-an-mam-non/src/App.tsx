@@ -86,7 +86,7 @@ export default function App() {
         </Routes>
       </Router>
       <Toaster
-        position="top-right"
+        position="bottom-right"
         toastOptions={{
           className: "",
           style: { fontSize: "13px" },
