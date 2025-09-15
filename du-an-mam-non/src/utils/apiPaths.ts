@@ -14,10 +14,17 @@ export const API_PATHS = {
   },
   USER: {
     GET_ALL_USERS: "api/user",
-    GET_USER_INFO: "api/user/my-info",
+    GET_USER_INFO: "api/user/my-account",
     UPDATE_USER: (id: string) => `api/user/${id}`,
     DELETE_USER: (id: string) => `api/user/${id}`,
     CHANGE_STATUS: (id: string) => `api/user/${id}/status`,
     CHANGE_ROLE: (id: string) => `api/user/${id}/role`,
+  },
+  LEVELS: {
+    GET_ALL_LEVELS: "api/levels",
+    CREATE_LEVEL: "api/levels",
+    DETAIL_LEVEL: (id: string) => `api/levels/${id}`,
+    UPDATE_LEVEL: (id: string) => `api/levels/${id}`,
+    DELETE_LEVEL: (id: string) => `api/levels/${id}`,
   },
 };
