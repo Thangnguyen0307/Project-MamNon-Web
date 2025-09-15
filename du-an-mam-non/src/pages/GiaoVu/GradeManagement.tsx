@@ -30,7 +30,7 @@ const GradeManagement: React.FC = () => {
 
   useEffect(() => {
     fetchAllLevels();
-  }, [selectedItem]);
+  }, []);
 
   const handleValueChange = (key: string, value: string) => {
     setLevelsParam((prev) => ({
@@ -45,6 +45,7 @@ const GradeManagement: React.FC = () => {
   };
   const modalUpdate = (id: string) => {
     setSelectedItem(id);
+    fetchDetailLevels(id);
     openModal();
   };
 
@@ -52,23 +53,32 @@ const GradeManagement: React.FC = () => {
     if (loading) return;
     setLoading(true);
     try {
-      if (!selectedItem) {
-        const response = await axiosInstance.get(
-          API_PATHS.LEVELS.GET_ALL_LEVELS
-        );
+      const response = await axiosInstance.get(API_PATHS.LEVELS.GET_ALL_LEVELS);
 
-        if (response.data.data.levels?.length > 0) {
-          toast.success("Lấy dữ liệu khối lợp học thành công");
-          setLevelsData(response.data.data.levels);
-        }
-      } else {
-        const response = await axiosInstance.get(
-          API_PATHS.LEVELS.DETAIL_LEVEL(selectedItem)
-        );
-        if (response.data.data) {
-          toast.success("Lấy dữ liệu chi tiết khối lợp học thành công");
-          setLevelsParam(response.data.data);
-        }
+      if (response.data.data.levels?.length > 0) {
+        toast.success("Lấy dữ liệu khối lợp học thành công");
+        setLevelsData(response.data.data.levels);
+      }
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      if (error.response && error.response.data.message) {
+        toast.error(error.response.data.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDetailLevels = async (id: string) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.LEVELS.DETAIL_LEVEL(id)
+      );
+      if (response.data.data) {
+        toast.success("Lấy dữ liệu chi tiết khối lợp học thành công");
+        setLevelsParam(response.data.data);
       }
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -104,7 +114,7 @@ const GradeManagement: React.FC = () => {
         );
         if (response) {
           toast.success("Cập nhật lớp học thành công");
-          setSelectedItem(null);
+          fetchAllLevels();
         }
       }
     } catch (err) {
@@ -123,7 +133,7 @@ const GradeManagement: React.FC = () => {
       );
       if (response) {
         toast.success("Xoá lớp học thành công");
-        setSelectedItem(null);
+        fetchAllLevels();
       }
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
