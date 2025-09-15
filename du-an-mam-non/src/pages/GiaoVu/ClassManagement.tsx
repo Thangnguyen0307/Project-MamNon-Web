@@ -55,7 +55,6 @@ const ClassManagement: React.FC = () => {
       }));
     }
   };
-  console.log(classesParam);
 
   const modalCreate = () => {
     setSelectedItem(null);
@@ -208,7 +207,7 @@ const ClassManagement: React.FC = () => {
           <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
             <div className="px-2 pr-14">
               <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-                Thêm lớp học mới
+                {!selectedItem ? "Thêm lớp học mới" : "Chi tiết lớp học"}
               </h4>
             </div>
             {loading ? (
@@ -222,6 +221,7 @@ const ClassManagement: React.FC = () => {
                       <Input
                         name="name"
                         type="text"
+                        placeholder="Vui lòng nhập tên lớp học"
                         value={classesParam.name ?? ""}
                         onChange={({ target }) => {
                           handleValueChange(target.name, target.value);
@@ -259,6 +259,7 @@ const ClassManagement: React.FC = () => {
                         name="schoolYear"
                         type="text"
                         value={classesParam.schoolYear ?? ""}
+                        placeholder="Vui lòng chọn niên khoá"
                         onChange={({ target }) => {
                           handleValueChange(target.name, target.value);
                         }}
@@ -314,21 +315,12 @@ const ClassManagement: React.FC = () => {
                     disabled={loading}>
                     Đóng
                   </Button>
-                  {!selectedItem ? (
-                    <Button
-                      size="sm"
-                      type="submit"
-                      className="bg-brand-500 text-white">
-                      Tạo mới
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      type="submit"
-                      className="bg-brand-500 text-white">
-                      Cập nhật
-                    </Button>
-                  )}
+                  <Button
+                    size="sm"
+                    type="submit"
+                    className="bg-brand-500 text-white">
+                    {!selectedItem ? "Tạo mới" : "Cập nhật"}
+                  </Button>
                 </div>
               </form>
             )}

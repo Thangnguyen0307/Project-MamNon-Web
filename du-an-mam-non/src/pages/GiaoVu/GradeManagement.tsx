@@ -20,12 +20,12 @@ const GradeManagement: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [levelsData, setLevelsData] = useState([]);
-  const defaultLevelsPram = {
+  const defaultLevelsParam = {
     name: "",
     createdAt: "",
     updatedAt: "",
   };
-  const [levelsPram, setLevelsParam] = useState(defaultLevelsPram);
+  const [levelsParam, setLevelsParam] = useState(defaultLevelsParam);
 
   useEffect(() => {
     fetchAllLevels();
@@ -40,9 +40,10 @@ const GradeManagement: React.FC = () => {
 
   const modalCreate = () => {
     setSelectedItem(null);
-    setLevelsParam(defaultLevelsPram);
+    setLevelsParam(defaultLevelsParam);
     openModal();
   };
+
   const modalUpdate = (id: string) => {
     setSelectedItem(id);
     fetchDetailLevels(id);
@@ -97,7 +98,7 @@ const GradeManagement: React.FC = () => {
         const response = await axiosInstance.post(
           API_PATHS.LEVELS.CREATE_LEVEL,
           {
-            name: levelsPram.name,
+            name: levelsParam.name,
           }
         );
         if (response) {
@@ -108,7 +109,7 @@ const GradeManagement: React.FC = () => {
         const response = await axiosInstance.put(
           API_PATHS.LEVELS.UPDATE_LEVEL(selectedItem),
           {
-            name: levelsPram.name,
+            name: levelsParam.name,
           }
         );
         if (response) {
@@ -162,15 +163,9 @@ const GradeManagement: React.FC = () => {
             className="max-w-[500px] m-4">
             <div className="no-scrollbar relative w-full max-w-[500px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
               <div className="px-2 pr-14">
-                {!selectedItem ? (
-                  <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90 text-center">
-                    Thêm khối lớp học mới
-                  </h4>
-                ) : (
-                  <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90 text-center">
-                    Chi tiết lớp học
-                  </h4>
-                )}
+                <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90 text-center">
+                  {!selectedItem ? "Thêm khối lớp học mới" : "Chi tiết lớp học"}
+                </h4>
               </div>
               {loading ? (
                 <p className="text-center">Đang tải dữ liệu...</p>
@@ -181,7 +176,7 @@ const GradeManagement: React.FC = () => {
                       <div>
                         <Label>Tên khối lớp học</Label>
                         <Input
-                          value={levelsPram.name ?? ""}
+                          value={levelsParam.name ?? ""}
                           name="name"
                           type="text"
                           placeholder="Vui lòng nhập tên khối lớp học"
@@ -198,7 +193,7 @@ const GradeManagement: React.FC = () => {
                             <Label>Ngày tạo</Label>
                             <Input
                               value={
-                                dayjs(levelsPram?.createdAt).format(
+                                dayjs(levelsParam?.createdAt).format(
                                   "DD/MM/YYYY HH:mm"
                                 ) ?? ""
                               }
@@ -213,7 +208,7 @@ const GradeManagement: React.FC = () => {
                             <Label>Ngày cập nhật</Label>
                             <Input
                               value={
-                                dayjs(levelsPram?.updatedAt).format(
+                                dayjs(levelsParam?.updatedAt).format(
                                   "DD/MM/YYYY HH:mm"
                                 ) ?? ""
                               }
@@ -238,21 +233,12 @@ const GradeManagement: React.FC = () => {
                       onClick={closeModal}>
                       Hủy
                     </Button>
-                    {!selectedItem ? (
-                      <Button
-                        size="sm"
-                        type="submit"
-                        className="bg-brand-500 text-white">
-                        Tạo mới
-                      </Button>
-                    ) : (
-                      <Button
-                        size="sm"
-                        type="submit"
-                        className="bg-brand-500 text-white">
-                        Cập nhật
-                      </Button>
-                    )}
+                    <Button
+                      size="sm"
+                      type="submit"
+                      className="bg-brand-500 text-white">
+                      {!selectedItem ? "Tạo mới" : "Cập nhật"}
+                    </Button>
                   </div>
                 </form>
               )}

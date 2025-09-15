@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 interface Option {
-  value: string;
+  value: string | boolean;
   label: string;
 }
 
@@ -25,7 +25,6 @@ const Select: React.FC<SelectProps> = ({
   // Manage the selected value
 
   const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
-  console.log(defaultValue);
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     const name = e.target.name;
@@ -54,8 +53,8 @@ const Select: React.FC<SelectProps> = ({
       {/* Map over options */}
       {options.map((option) => (
         <option
-          key={option.value}
-          value={option.value}
+          key={option.value.toString()}
+          value={option.value.toString()}
           className="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
           {option.label}
         </option>

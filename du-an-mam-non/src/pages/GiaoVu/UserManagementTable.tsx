@@ -8,55 +8,25 @@ import {
 } from "../../components/ui/table";
 import { DeleteUserIcon, EditUserIcon } from "../../icons";
 import Pagination from "../../components/common/Pagination";
+import Badge from "../../components/ui/badge/Badge";
 
-interface Teacher {
-  userid: string;
-  password: string;
-  full_name: string;
+export interface UserData {
+  id: string;
+  email: string;
   role: string;
+  fullName: string;
+  isActive: boolean;
 }
 
-const tableData: Teacher[] = [
-  {
-    userid: "gv001",
-    password: "123456",
-    full_name: "Nguyễn Văn An",
-    role: "Giáo viên",
-  },
-  {
-    userid: "gv002",
-    password: "abcdef",
-    full_name: "Trần Thị Bình",
-    role: "Quản trị viên",
-  },
-  {
-    userid: "gv003",
-    password: "qwerty",
-    full_name: "Phạm Văn Cường",
-    role: "Giáo viên",
-  },
-  {
-    userid: "gv004",
-    password: "654321",
-    full_name: "Lê Thị Dung",
-    role: "Giáo viên",
-  },
-  {
-    userid: "gv005",
-    password: "password",
-    full_name: "Hoàng Văn Em",
-    role: "Quản trị viên",
-  },
-];
+interface TableProps {
+  data: UserData[];
+  modalUpdate: (id: string, type: string) => void;
+}
 
-const UserManagementTable: React.FC = () => {
-  const [data, setData] = React.useState(tableData);
-  const handleDelete = (userid: string) => {
-    setData(data.filter((teacher) => teacher.userid !== userid));
-  };
-  const handleRole = (teacher: Teacher) => {
-    alert("Phân quyền cho " + teacher.full_name);
-  };
+export const UserManagementTable: React.FC<TableProps> = ({
+  data,
+  modalUpdate,
+}) => {
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
@@ -65,56 +35,60 @@ const UserManagementTable: React.FC = () => {
             <TableRow>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">
-                UserID
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                Email
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">
-                Mật khẩu
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                Họ và tên
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">
-                Họ tên
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                Role
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">
-                Phân quyền
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                Trạng thái
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Action
               </TableCell>
             </TableRow>
           </TableHeader>
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((teacher) => (
-              <TableRow key={teacher.userid}>
-                <TableCell className="px-4 py-3 text-center">
-                  {teacher.userid}
+            {data.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell className="px-4 py-3 text-start">
+                  {item.email}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-center">
-                  {teacher.password}
+                <TableCell className="px-4 py-3 text-start">
+                  {item.fullName}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-center">
-                  {teacher.full_name}
+                <TableCell className="px-4 py-3 text-start">
+                  {item.role}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-center">
-                  {teacher.role}
+                <TableCell className="px-4 py-3 text-start">
+                  <Badge
+                    size="md"
+                    color={item.isActive === true ? "success" : "error"}>
+                    {item.isActive ? <span>Hoạt động</span> : <span>Khoá</span>}
+                  </Badge>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-center">
-                  <div className="flex items-center gap-5 justify-center">
+                <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">
+                  <div className="flex items-center gap-5">
                     <span
-                      className="text-lg hover:cursor-pointer hover:scale-110 transition-all duration-200 ease-in-out"
-                      onClick={() => handleRole(teacher)}>
+                      className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
+                      onClick={() => modalUpdate(item.id, "changeRole")}>
                       <EditUserIcon />
                     </span>
                     <span
-                      className="text-lg hover:cursor-pointer hover:scale-110 transition-all duration-200 ease-in-out"
-                      onClick={() => handleDelete(teacher.userid)}>
+                      className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
+                      onClick={() => modalUpdate(item.id, "changeStatus")}>
                       <DeleteUserIcon />
                     </span>
                   </div>
