@@ -88,9 +88,10 @@ const UserManagement = () => {
       const response = await axiosInstance.get(
         `${API_PATHS.ADMIN.GET_ALL_USER}?page=${pagination.page}&limit=${pagination.limit}`
       );
-      if (response.data?.length > 0) {
-        setUserData(response.data);
-        console.log(response.data);
+
+      if (response.data.users?.length > 0) {
+        setUserData(response.data.users);
+        setPagination(response.data.pagination);
       }
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
