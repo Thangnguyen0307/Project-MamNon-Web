@@ -63,15 +63,12 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
           signal: controller.signal as any, // tránh TS warning nếu cần
         });
 
-        // Tuỳ BE: có thể trả { data: User } hoặc trả thẳng User
         const payload: any = res?.data;
         const userData: User | null = payload?.data ?? payload ?? null;
 
         if (active && userData) setUser(userData);
       } catch (err) {
-        // 401 sẽ do interceptor xử lý (refresh hoặc clear token). Ở đây chỉ set user null.
         if (active) setUser(null);
-        // console.debug("Failed to fetch user info", err);
       } finally {
         if (active) setLoading(false);
       }

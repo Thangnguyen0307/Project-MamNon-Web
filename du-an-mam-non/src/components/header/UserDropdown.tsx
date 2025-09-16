@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { logout } from "../../services/authService";
 import { useUser } from "../../context/UserContext";
 
@@ -23,12 +23,11 @@ export default function UserDropdown() {
     if (signingOut) return;
     setSigningOut(true);
     try {
-      await logout();        
-      clearUser();            
+      await logout();
+      clearUser();
       closeDropdown();
       navigate("/signin", { replace: true });
     } catch {
-
       navigate("/signin", { replace: true });
     } finally {
       setSigningOut(false);

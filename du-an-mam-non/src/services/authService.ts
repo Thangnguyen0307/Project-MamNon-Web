@@ -1,13 +1,14 @@
 import { axiosInstance } from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
 
-export type SendOtpPayload = { email: string };
+export type SendOtpPayload = { email: string; type?: "RESET_PASSWORD"; };
 export type ResetPasswordPayload = { email: string; otp: string; newPassword: string };
 export type UpdatePasswordPayload = { currentPassword: string; newPassword: string };
 
-export async function sendOtp(payload: SendOtpPayload) {
-  const { data } = await axiosInstance.post(API_PATHS.AUTH.SEND_OTP, payload);
-  return data; // { message }
+
+export async function sendOtp({ email, type = "RESET_PASSWORD" }: SendOtpPayload) {
+  const { data } = await axiosInstance.post(API_PATHS.AUTH.SEND_OTP,{ email },{ params: { type } } );
+  return data;
 }
 
 export async function resetPassword(payload: ResetPasswordPayload) {

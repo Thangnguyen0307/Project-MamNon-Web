@@ -1,3 +1,4 @@
+import { BrowserRouter } from "react-router-dom";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
@@ -10,12 +11,14 @@ import UserProvider from "./context/UserContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <UserProvider>
-      <ThemeProvider>
-        <AppWrapper>
-          <App />
-        </AppWrapper>
-      </ThemeProvider>
-    </UserProvider>
+    <BrowserRouter>
+      <UserProvider>
+        <ThemeProvider>
+          <AppWrapper>
+            <App />
+          </AppWrapper>
+        </ThemeProvider>
+      </UserProvider>
+    </BrowserRouter>
   </StrictMode>
 );

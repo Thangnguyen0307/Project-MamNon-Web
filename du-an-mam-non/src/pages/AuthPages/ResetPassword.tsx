@@ -6,10 +6,7 @@ export default function ResetPasswordPage() {
   return (
     <>
       <PageMeta title="Reset Password" />
-      <AuthLayout
-        title="Đặt lại mật khẩu"
-        subtitle="Nhập email để nhận OTP và đổi mật khẩu"
-      >
+      <AuthLayout title="Đặt lại mật khẩu" subtitle="Nhập email, OTP và mật khẩu mới">
         <ResetPasswordForm />
       </AuthLayout>
     </>

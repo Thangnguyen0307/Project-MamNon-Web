@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
@@ -60,11 +60,10 @@ export default function SignInForm() {
         throw new Error("Login succeeded but no accessToken was returned.");
       }
 
-      // 3) Lưu token trước để các request kế tiếp đính kèm Authorization
       localStorage.setItem("accessToken", accessToken);
       if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
 
-      // 4) Cập nhật context ngay để ProtectedRoute pass
+
       if (userData) {
         updateUser(userData);
       } else {
@@ -75,7 +74,6 @@ export default function SignInForm() {
           const me = mePayload?.data ?? mePayload ?? null;
           if (me) updateUser(me);
         } catch {
-          // nếu vẫn không lấy được, cứ điều hướng; interceptor sẽ xử lý nếu token invalid
         }
       }
 
