@@ -21,11 +21,22 @@ export interface UserData {
 interface TableProps {
   data: UserData[];
   modalUpdate: (id: string, type: string) => void;
+  setPage: (key: string, value: number) => void;
+  pagination: Pagination;
+}
+
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
 }
 
 export const UserManagementTable: React.FC<TableProps> = ({
   data,
   modalUpdate,
+  setPage,
+  pagination,
 }) => {
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -98,7 +109,12 @@ export const UserManagementTable: React.FC<TableProps> = ({
           </TableBody>
         </Table>
         {/* Pagination */}
-        <Pagination total={20} />
+        <Pagination
+          total={pagination.total}
+          limit={pagination.limit}
+          current={pagination.page}
+          setPage={setPage}
+        />
       </div>
     </div>
   );

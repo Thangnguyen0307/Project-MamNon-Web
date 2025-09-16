@@ -20,6 +20,12 @@ const GradeManagement: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [levelsData, setLevelsData] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 1,
+    total: 0,
+    pages: 0,
+  });
   const defaultLevelsParam = {
     name: "",
     createdAt: "",
@@ -29,10 +35,16 @@ const GradeManagement: React.FC = () => {
 
   useEffect(() => {
     fetchAllLevels();
-  }, []);
+  }, [pagination.page]);
 
   const handleValueChange = (key: string, value: string) => {
     setLevelsParam((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+  const setPage = (key: string, value: number) => {
+    setPagination((prev) => ({
       ...prev,
       [key]: value,
     }));
@@ -54,10 +66,13 @@ const GradeManagement: React.FC = () => {
     if (loading) return;
     setLoading(true);
     try {
-      const response = await axiosInstance.get(API_PATHS.LEVELS.GET_ALL_LEVELS);
+      const response = await axiosInstance.get(
+        `${API_PATHS.LEVELS.GET_ALL_LEVELS}?page=${pagination.page}&limit=${pagination.limit}`
+      );
 
       if (response.data.data.levels?.length > 0) {
         setLevelsData(response.data.data.levels);
+        setPagination(response.data.data.pagination);
       }
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -156,6 +171,8 @@ const GradeManagement: React.FC = () => {
             data={levelsData}
             modalUpdate={modalUpdate}
             deleteData={handleDelete}
+            setPage={setPage}
+            pagination={pagination}
           />
           <Modal
             isOpen={isOpen}

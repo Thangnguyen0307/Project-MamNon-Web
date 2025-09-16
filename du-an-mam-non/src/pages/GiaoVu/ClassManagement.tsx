@@ -24,6 +24,12 @@ const ClassManagement: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [classesData, setClassesData] = useState([]);
   const [optionLevels, setOptionLevels] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 1,
+    total: 0,
+    pages: 0,
+  });
   const defaultClassesParam = {
     name: "",
     schoolYear: "",
@@ -36,9 +42,18 @@ const ClassManagement: React.FC = () => {
     updatedAt: "",
   };
   const [classesParam, setClassesParam] = useState(defaultClassesParam);
+  const setPage = (key: string, value: number) => {
+    setPagination((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
   useEffect(() => {
     fetchAllClasses();
+  }, [pagination.page]);
+
+  useEffect(() => {
     fetchOptionsLevels();
   }, []);
 
@@ -91,11 +106,12 @@ const ClassManagement: React.FC = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(
-        API_PATHS.CLASSES.GET_ALL_CLASSES
+        `${API_PATHS.CLASSES.GET_ALL_CLASSES}?page=${pagination.page}&limit=${pagination.limit}`
       );
 
       if (response.data.data.classes?.length > 0) {
         setClassesData(response.data.data.classes);
+        setPagination(response.data.data.pagination);
       }
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -198,6 +214,8 @@ const ClassManagement: React.FC = () => {
             data={classesData}
             modalUpdate={modalUpdate}
             deleteData={handleDelete}
+            setPage={setPage}
+            pagination={pagination}
           />
         </ComponentCard>
         <Modal

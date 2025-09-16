@@ -1,4 +1,4 @@
-export const BASE_URL = "https://project-mamnon-be.onrender.com/";
+export const BASE_URL = "https://techleaf.pro/projects/mam-non-media/";
 
 export const API_PATHS = {
   AUTH: {
@@ -36,5 +36,12 @@ export const API_PATHS = {
     DETAIL_CLASSES: (id: string) => `api/classes/${id}`,
     UPDATE_CLASSES: (id: string) => `api/classes/${id}`,
     DELETE_CLASSES: (id: string) => `api/classes/${id}`,
+  },
+  BLOG: {
+    GET_ALL_BLOGS: "api/blogs",
+    CREATE_BLOG: "api/blogs",
+    DETAIL_BLOG: (id: string) => `api/blogs/${id}`,
+    UPDATE_BLOG: (id: string) => `api/blogs/${id}`,
+    DELETE_BLOG: (id: string) => `api/blogs/${id}`,
   },
 };

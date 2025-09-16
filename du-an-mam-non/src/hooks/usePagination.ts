@@ -1,23 +1,23 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 
 export const usePagination = (
   totalItems: number,
-  itemsPerPage: number = 10
+  itemsPerPage: number = 10,
+  currentPage: number,
+  setPage: (key: string, value: number) => void
 ) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const start = (currentPage - 1) * itemsPerPage + 1;
-
   const end = Math.min(currentPage * itemsPerPage, totalItems);
 
   const goToPage = useCallback(
     (page: number) => {
       if (page >= 1 && page <= totalPages) {
-        setCurrentPage(page);
+        setPage("page", page);
       }
     },
-    [totalPages]
+    [totalPages, setPage]
   );
 
   const nextPage = useCallback(() => {

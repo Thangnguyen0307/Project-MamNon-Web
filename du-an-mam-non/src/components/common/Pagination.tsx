@@ -4,9 +4,16 @@ import { usePagination } from "../../hooks/usePagination";
 interface ModalProps {
   total: number;
   limit?: number;
+  current: number;
+  setPage: (key: string, value: number) => void;
 }
 
-const Pagination: React.FC<ModalProps> = ({ total, limit = 10 }) => {
+const Pagination: React.FC<ModalProps> = ({
+  total,
+  limit = 10,
+  setPage,
+  current,
+}) => {
   const {
     currentPage,
     totalPages,
@@ -16,7 +23,7 @@ const Pagination: React.FC<ModalProps> = ({ total, limit = 10 }) => {
     nextPage,
     prevPage,
     totalItems,
-  } = usePagination(total, limit);
+  } = usePagination(total, limit, current, setPage);
 
   return (
     <>

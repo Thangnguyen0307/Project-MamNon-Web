@@ -2,7 +2,7 @@ import DatePicker from "../../components/form/date-picker";
 import Select from "../../components/form/Select";
 import Filter from "../../components/ui/filter";
 
-const ActivityManagementFilter = () => {
+const BlogManagementFilter = () => {
   const options = [
     { value: "marketing", label: "Marketing" },
     { value: "template", label: "Template" },
@@ -31,4 +31,4 @@ const ActivityManagementFilter = () => {
   );
 };
 
-export default ActivityManagementFilter;
+export default BlogManagementFilter;

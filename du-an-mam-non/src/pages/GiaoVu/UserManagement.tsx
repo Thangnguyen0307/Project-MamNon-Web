@@ -30,6 +30,7 @@ const UserManagement = () => {
   const [selectedType, setSelectedType] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState([]);
+
   const defaultUsersParam = {
     id: "",
     email: "",
@@ -37,11 +38,23 @@ const UserManagement = () => {
     fullName: "",
     isActive: "",
   };
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 1,
+    total: 0,
+    pages: 0,
+  });
+  const setPage = (key: string, value: number) => {
+    setPagination((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
   const [usersParam, setUsersParam] = useState(defaultUsersParam);
 
   useEffect(() => {
     fetchAllUsers();
-  }, []);
+  }, [pagination.page]);
 
   const handleValueChange = (key: string, value: string) => {
     setUsersParam((prev) => ({
@@ -72,9 +85,12 @@ const UserManagement = () => {
     if (loading) return;
     setLoading(true);
     try {
-      const response = await axiosInstance.get(API_PATHS.ADMIN.GET_ALL_USER);
+      const response = await axiosInstance.get(
+        `${API_PATHS.ADMIN.GET_ALL_USER}?page=${pagination.page}&limit=${pagination.limit}`
+      );
       if (response.data?.length > 0) {
         setUserData(response.data);
+        console.log(response.data);
       }
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -176,7 +192,12 @@ const UserManagement = () => {
           title="Danh sách người dùng"
           button={<Button onClick={modalCreate}>Thêm giáo viên</Button>}
           filter={<UserManagementFilter />}>
-          <UserManagementTable data={userData} modalUpdate={modalUpdate} />
+          <UserManagementTable
+            data={userData}
+            modalUpdate={modalUpdate}
+            setPage={setPage}
+            pagination={pagination}
+          />
         </ComponentCard>
         <Modal
           isOpen={isOpen}
