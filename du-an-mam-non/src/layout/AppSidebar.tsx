@@ -29,7 +29,7 @@ type NavItem = {
 const navItems: NavItem[] = [
   {
     icon: <UserIcon />,
-    name: "Quản lý lop học",
+    name: "Quản lý lớp học",
     path: "/gvuquanlylophoc",
   },
   {

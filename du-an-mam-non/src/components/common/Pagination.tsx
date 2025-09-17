@@ -30,11 +30,11 @@ const Pagination: React.FC<ModalProps> = ({
       <div className="flex flex-col items-center justify-between border-t border-gray-200 px-5 py-4 sm:flex-row dark:border-gray-800">
         <div className="pb-3 sm:pb-0">
           <span className="block text-sm font-medium text-gray-500 dark:text-gray-400">
-            Showing
+            Từ
             <span className="text-gray-800 dark:text-white/90"> {start} </span>
-            to
+            đến
             <span className="text-gray-800 dark:text-white/90"> {end} </span>
-            of
+            của
             <span className="text-gray-800 dark:text-white/90">
               {" "}
               {totalItems}

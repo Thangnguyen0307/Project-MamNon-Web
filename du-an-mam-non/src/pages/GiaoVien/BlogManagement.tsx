@@ -35,7 +35,7 @@ const BlogManagement: React.FC = () => {
   };
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 1,
+    limit: 10,
     total: 0,
     pages: 0,
   });

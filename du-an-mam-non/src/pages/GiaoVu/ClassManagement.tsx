@@ -17,16 +17,28 @@ import { ClassManagementTable } from "./ClassManagementTable";
 import dayjs from "dayjs";
 import Select from "../../components/form/Select";
 import { LevelsData } from "./GradeManagementTable";
+import { UserData } from "./UserManagementTable";
+import MultiSelect from "../../components/form/MultiSelect";
 
 const ClassManagement: React.FC = () => {
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedItem, setSelectedItem] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [classesData, setClassesData] = useState([]);
-  const [optionLevels, setOptionLevels] = useState([]);
+  const [optionsProp, setOptionsProp] = useState({
+    optionsLevels: [],
+    optionsTeachers: [],
+  });
+  const [selectedTeacherArr, setSelectedTeacherArr] = useState<string[]>([]);
+  const [queryParams, setQueryParams] = useState({
+    level: "",
+    teacher: "",
+    startYear: "",
+    endYear: "",
+  });
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 1,
+    limit: 10,
     total: 0,
     pages: 0,
   });
@@ -37,7 +49,7 @@ const ClassManagement: React.FC = () => {
       id: "",
       name: "",
     },
-    teacher: [],
+    teachers: [],
     createdAt: "",
     updatedAt: "",
   };
@@ -49,12 +61,26 @@ const ClassManagement: React.FC = () => {
     }));
   };
 
+  const setOptions = (key: string, value: string) => {
+    setOptionsProp((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const setQuery = (key: string, value: string) => {
+    setQueryParams((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
   useEffect(() => {
     fetchAllClasses();
-  }, [pagination.page]);
+  }, [pagination.page, queryParams]);
 
   useEffect(() => {
     fetchOptionsLevels();
+    fetchOptionsTeachers();
   }, []);
 
   const handleValueChange = (key: string, value: string) => {
@@ -91,7 +117,7 @@ const ClassManagement: React.FC = () => {
           value: item.id,
           label: item.name,
         }));
-        setOptionLevels(options);
+        setOptions("optionsLevels", options);
       }
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -101,18 +127,46 @@ const ClassManagement: React.FC = () => {
     }
   };
 
+  const fetchOptionsTeachers = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `${API_PATHS.ADMIN.GET_ALL_USER}?role=TEACHER`
+      );
+
+      if (response.data.users?.length > 0) {
+        const options = response.data.users.map((item: UserData) => ({
+          value: item.id,
+          label: item.fullName,
+        }));
+        setOptions("optionsTeachers", options);
+      }
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      if (error.response && error.response.data.message) {
+        toast.error(error.response.data.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchAllClasses = async () => {
     if (loading) return;
     setLoading(true);
     try {
       const response = await axiosInstance.get(
-        `${API_PATHS.CLASSES.GET_ALL_CLASSES}?page=${pagination.page}&limit=${pagination.limit}`
+        `${API_PATHS.CLASSES.GET_ALL_CLASSES}?page=${pagination.page}&limit=${pagination.limit}` +
+          (queryParams?.level ? `&level=${queryParams.level}` : "") +
+          (queryParams?.startYear && queryParams?.endYear
+            ? `&schoolYear=${queryParams.startYear}-${queryParams.endYear}`
+            : "") +
+          (queryParams?.teacher ? `&teacher=${queryParams.teacher}` : "")
       );
 
       if (response.data.data.classes?.length > 0) {
         setClassesData(response.data.data.classes);
         setPagination(response.data.data.pagination);
-      }
+      } else setClassesData([]);
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
       if (error.response && error.response.data.message) {
@@ -155,6 +209,7 @@ const ClassManagement: React.FC = () => {
             name: classesParam.name,
             level: classesParam.level.id,
             schoolYear: classesParam.schoolYear,
+            teachers: selectedTeacherArr,
           }
         );
         if (response) {
@@ -168,6 +223,7 @@ const ClassManagement: React.FC = () => {
             name: classesParam.name,
             level: classesParam.level.id,
             schoolYear: classesParam.schoolYear,
+            teachers: selectedTeacherArr,
           }
         );
         if (response) {
@@ -209,7 +265,13 @@ const ClassManagement: React.FC = () => {
         <ComponentCard
           title="Danh sách lớp học"
           button={<Button onClick={modalCreate}>Thêm lớp học</Button>}
-          filter={<ClassManagementFilter />}>
+          filter={
+            <ClassManagementFilter
+              optionsTeachers={optionsProp.optionsTeachers}
+              optionsLevels={optionsProp.optionsLevels}
+              setQueryParams={setQuery}
+            />
+          }>
           <ClassManagementTable
             data={classesData}
             modalUpdate={modalUpdate}
@@ -248,11 +310,11 @@ const ClassManagement: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <Label>Khối lớp (level)</Label>
+                      <Label>Khối lớp</Label>
                       <Select
                         name="levelName"
                         defaultValue={classesParam.level.id}
-                        options={optionLevels}
+                        options={optionsProp.optionsLevels}
                         placeholder="Chọn khối lớp"
                         onChange={(name, value) => {
                           handleValueChange(name, value);
@@ -260,17 +322,15 @@ const ClassManagement: React.FC = () => {
                         className="dark:bg-dark-900"
                       />
                     </div>
-                    {/* <div>
-                    <Label>Giáo viên (ID, cách nhau dấu phẩy)</Label>
-                    <Input
-                      type="text"
-                      value={classesParam.teacher}
-                      onChange={({ target }) => {
-                        handleValueChange(target.name, target.value);
-                      }}
-                      placeholder="Ví dụ: id1,id2"
-                    />
-                  </div> */}
+                    <div>
+                      <MultiSelect
+                        label="Giáo viên"
+                        options={optionsProp.optionsTeachers}
+                        defaultSelected={[]}
+                        placeholder="Lựa chọn giáo viên"
+                        onChange={(values) => setSelectedTeacherArr(values)}
+                      />
+                    </div>
                     <div>
                       <Label>Năm học (schoolYear)</Label>
                       <Input
@@ -329,8 +389,7 @@ const ClassManagement: React.FC = () => {
                     size="sm"
                     variant="outline"
                     onClick={closeModal}
-                    type="button"
-                    disabled={loading}>
+                    type="button">
                     Đóng
                   </Button>
                   <Button

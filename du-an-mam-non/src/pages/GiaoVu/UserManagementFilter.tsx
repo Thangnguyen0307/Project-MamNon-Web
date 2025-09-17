@@ -1,31 +1,29 @@
-import DatePicker from "../../components/form/date-picker";
 import Select from "../../components/form/Select";
 import Filter from "../../components/ui/filter";
 
-const UserManagementFilter = () => {
-  const options = [
-    { value: "marketing", label: "Marketing" },
-    { value: "template", label: "Template" },
-    { value: "development", label: "Development" },
-  ];
+interface OptionsProps {
+  value: string;
+  label: string;
+}
 
+interface PropFilter {
+  optionsRole: OptionsProps[];
+  setQueryParams: (key: string, value: string) => void;
+}
+
+const UserManagementFilter: React.FC<PropFilter> = ({
+  optionsRole,
+  setQueryParams,
+}) => {
   return (
-    <Filter>
-      <DatePicker
-        id="date-picker"
-        placeholder="Chọn niên khoá"
-        onChange={(dates, currentDateString) => {
-          // Handle your logic
-          console.log({ dates, currentDateString });
-        }}
-        type="Y"
-      />
+    <Filter search setQuery={setQueryParams}>
       <div className="w-1/6">
         <Select
-          options={options}
-          placeholder="Select Option"
+          name="role"
+          options={optionsRole}
+          placeholder="Lọc theo cấp bậc"
           onChange={(name, value) => {
-            console.log("Selected value:", value, name);
+            setQueryParams(name, value);
           }}
           className="dark:bg-dark-900  "
         />

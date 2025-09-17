@@ -9,7 +9,7 @@ const BlogManagementFilter = () => {
     { value: "development", label: "Development" },
   ];
   return (
-    <Filter>
+    <Filter search>
       <DatePicker
         id="date-picker"
         placeholder="Chọn niên khoá"

@@ -3,7 +3,6 @@ import ComponentCard from "../../components/common/ComponentCard";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import GradeManagementFilter from "./GradeManagementFilter";
 import { useModal } from "../../hooks/useModal";
 import { Modal } from "../../components/ui/modal";
 import Label from "../../components/form/Label";
@@ -20,9 +19,10 @@ const GradeManagement: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [levelsData, setLevelsData] = useState([]);
+
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 1,
+    limit: 10,
     total: 0,
     pages: 0,
   });
@@ -165,8 +165,7 @@ const GradeManagement: React.FC = () => {
       <div className="space-y-6">
         <ComponentCard
           title="Danh sách khối lớp học"
-          button={<Button onClick={modalCreate}>Thêm khối lớp học</Button>}
-          filter={<GradeManagementFilter />}>
+          button={<Button onClick={modalCreate}>Thêm khối lớp học</Button>}>
           <GradeManagementTable
             data={levelsData}
             modalUpdate={modalUpdate}

@@ -60,7 +60,6 @@ export const GradeManagementTable: React.FC<TableProps> = ({
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Ngày cập nhật
               </TableCell>
-
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
@@ -102,7 +101,11 @@ export const GradeManagementTable: React.FC<TableProps> = ({
               ))}
             </TableBody>
           ) : (
-            <div>Chưa có dữ liệu</div>
+            <tr className="">
+              <td colSpan={4} className="px-4 py-3 text-center">
+                Không có dữ liệu
+              </td>
+            </tr>
           )}
         </Table>
         {/* Pagination */}

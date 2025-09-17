@@ -11,11 +11,16 @@ import { DeleteUserIcon, EditUserIcon } from "../../icons";
 import Pagination from "../../components/common/Pagination";
 import { LevelsData } from "./GradeManagementTable";
 
+interface Teacher {
+  id: string;
+  fullName: string;
+}
 export interface ClassesData {
   id: string;
   name: string;
   schoolYear: string;
   level: LevelsData;
+  teachers: Teacher[];
   createdAt: string;
   updatedAt: string;
 }
@@ -42,6 +47,8 @@ export const ClassManagementTable: React.FC<TableProps> = ({
   setPage,
   pagination,
 }) => {
+  console.log(data);
+
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
@@ -89,7 +96,11 @@ export const ClassManagementTable: React.FC<TableProps> = ({
                     {item.level.name.toUpperCase()}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-black text-start text-theme-sm dark:text-gray-400">
-                    fix
+                    {item.teachers.length > 0
+                      ? item.teachers.map((teacher: Teacher) => {
+                          return <p key={teacher.id}>{teacher.fullName}</p>;
+                        })
+                      : "Chưa phân công giáo viên"}{" "}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-black text-start text-theme-sm dark:text-gray-400">
                     {item.schoolYear}
@@ -112,7 +123,11 @@ export const ClassManagementTable: React.FC<TableProps> = ({
               ))}
             </TableBody>
           ) : (
-            <div>Chưa có dữ liệu</div>
+            <tr className="">
+              <td colSpan={5} className="px-4 py-3 text-center">
+                Không có dữ liệu
+              </td>
+            </tr>
           )}
         </Table>
 

@@ -139,7 +139,11 @@ export const BlogsManagementTable: React.FC<TableProps> = ({
               ))}
             </TableBody>
           ) : (
-            <div>Chưa có dữ liệu</div>
+            <tr className="">
+              <td colSpan={6} className="px-4 py-3 text-center">
+                Không có dữ liệu
+              </td>
+            </tr>
           )}
         </Table>
         {/* Pagination */}

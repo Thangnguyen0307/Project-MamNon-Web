@@ -71,42 +71,55 @@ export const UserManagementTable: React.FC<TableProps> = ({
               </TableCell>
             </TableRow>
           </TableHeader>
-          <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {data.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell className="px-4 py-3 text-start">
-                  {item.email}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-start">
-                  {item.fullName}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-start">
-                  {item.role}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-start">
-                  <Badge
-                    size="md"
-                    color={item.isActive === true ? "success" : "error"}>
-                    {item.isActive ? <span>Hoạt động</span> : <span>Khoá</span>}
-                  </Badge>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">
-                  <div className="flex items-center gap-5">
-                    <span
-                      className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
-                      onClick={() => modalUpdate(item.id, "changeRole")}>
-                      <EditUserIcon />
-                    </span>
-                    <span
-                      className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
-                      onClick={() => modalUpdate(item.id, "changeStatus")}>
-                      <DeleteUserIcon />
-                    </span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+
+          {data.length > 0 ? (
+            data.map((item) => (
+              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                <TableRow key={item.id}>
+                  <TableCell className="px-4 py-3 text-start">
+                    {item.email}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-start">
+                    {item.fullName}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-start">
+                    {item.role}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-start">
+                    <Badge
+                      size="md"
+                      color={item.isActive === true ? "success" : "error"}>
+                      {item.isActive ? (
+                        <span>Hoạt động</span>
+                      ) : (
+                        <span>Khoá</span>
+                      )}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">
+                    <div className="flex items-center gap-5">
+                      <span
+                        className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
+                        onClick={() => modalUpdate(item.id, "changeRole")}>
+                        <EditUserIcon />
+                      </span>
+                      <span
+                        className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
+                        onClick={() => modalUpdate(item.id, "changeStatus")}>
+                        <DeleteUserIcon />
+                      </span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            ))
+          ) : (
+            <tr className="">
+              <td colSpan={5} className="px-4 py-3 text-center">
+                Không có dữ liệu
+              </td>
+            </tr>
+          )}
         </Table>
         {/* Pagination */}
         <Pagination

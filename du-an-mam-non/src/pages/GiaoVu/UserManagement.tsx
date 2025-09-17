@@ -18,19 +18,18 @@ import { toBoolean } from "../../utils/helper";
 
 const UserManagement = () => {
   const { isOpen, openModal, closeModal } = useModal();
-  const role = [
-    { value: "ADMIN", label: "Admin" },
-    { value: "TEACHER", label: "Teacher" },
-  ];
-  const status = [
-    { value: true, label: "Hoạt động" },
-    { value: false, label: "Khoá" },
-  ];
   const [selectedItem, setSelectedItem] = useState<null | string>(null);
   const [selectedType, setSelectedType] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState([]);
-
+  const optionsRole = [
+    { value: "ADMIN", label: "Admin" },
+    { value: "TEACHER", label: "Teacher" },
+  ];
+  const optionsStatus = [
+    { value: true, label: "Hoạt động" },
+    { value: false, label: "Khoá" },
+  ];
   const defaultUsersParam = {
     id: "",
     email: "",
@@ -38,9 +37,14 @@ const UserManagement = () => {
     fullName: "",
     isActive: "",
   };
+  const [queryParams, setQueryParams] = useState({
+    role: "",
+    keyword: "",
+  });
+  const [usersParam, setUsersParam] = useState(defaultUsersParam);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 1,
+    limit: 10,
     total: 0,
     pages: 0,
   });
@@ -50,14 +54,20 @@ const UserManagement = () => {
       [key]: value,
     }));
   };
-  const [usersParam, setUsersParam] = useState(defaultUsersParam);
 
   useEffect(() => {
     fetchAllUsers();
-  }, [pagination.page]);
+  }, [pagination.page, queryParams]);
 
   const handleValueChange = (key: string, value: string) => {
     setUsersParam((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const setQuery = (key: string, value: string) => {
+    setQueryParams((prev) => ({
       ...prev,
       [key]: value,
     }));
@@ -86,12 +96,16 @@ const UserManagement = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(
-        `${API_PATHS.ADMIN.GET_ALL_USER}?page=${pagination.page}&limit=${pagination.limit}`
+        `${API_PATHS.ADMIN.GET_ALL_USER}?page=${pagination.page}&limit=${pagination.limit}` +
+          (queryParams?.role ? `&role=${queryParams.role}` : "") +
+          (queryParams?.keyword ? `&keyword=${queryParams.keyword}` : "")
       );
 
       if (response.data.users?.length > 0) {
         setUserData(response.data.users);
         setPagination(response.data.pagination);
+      } else {
+        setUserData([]);
       }
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -192,7 +206,12 @@ const UserManagement = () => {
         <ComponentCard
           title="Danh sách người dùng"
           button={<Button onClick={modalCreate}>Thêm giáo viên</Button>}
-          filter={<UserManagementFilter />}>
+          filter={
+            <UserManagementFilter
+              setQueryParams={setQuery}
+              optionsRole={optionsRole}
+            />
+          }>
           <UserManagementTable
             data={userData}
             modalUpdate={modalUpdate}
@@ -241,8 +260,8 @@ const UserManagement = () => {
                           <Label>Role</Label>
                           <Select
                             name="role"
-                            options={role}
-                            placeholder="Vui lòng chọn trạng thái người dùng"
+                            options={optionsRole}
+                            placeholder="Vui lòng chọn cấp bậc thái người dùng"
                             onChange={(name, value) =>
                               handleValueChange(name, value)
                             }
@@ -255,7 +274,7 @@ const UserManagement = () => {
                           <Label>Status</Label>
                           <Select
                             name="isActive"
-                            options={status}
+                            options={optionsStatus}
                             placeholder="Vui lòng chọn trạng thái người dùng"
                             onChange={(name, value) =>
                               handleValueChange(name, value)
