@@ -25,11 +25,13 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 import PublicRoute from "./components/common/PublicRoute";
 import { Toaster } from "react-hot-toast";
 import BlogManagement from "./pages/GiaoVien/BlogManagement";
+import HomePage from "./pages/HomePage/HomePage";
 
 export default function App() {
   return (
     <>
       <Router>
+        
         <ScrollToTop />
         <Routes>
           {/* Dashboard Layout */}
@@ -37,6 +39,8 @@ export default function App() {
             <Route element={<AppLayout />}>
               <Route index path="/" element={<Home />} />
 
+              
+              
               {/* Giáo Vụ */}
               <Route path="/gvuquanlynguoidung" element={<UserManagement />} />
               <Route path="/gvuquanlylophoc" element={<ClassManagement />} />
@@ -72,6 +76,9 @@ export default function App() {
               <Route path="/bar-chart" element={<BarChart />} />
             </Route>
           </Route>
+
+          {/* HomePage   */}
+          <Route path="/homepage" element={<HomePage />} />
 
           {/* Auth Layout */}
           <Route element={<PublicRoute />}>
