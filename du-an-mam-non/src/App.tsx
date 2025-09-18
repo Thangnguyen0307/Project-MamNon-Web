@@ -25,6 +25,7 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 import PublicRoute from "./components/common/PublicRoute";
 import { Toaster } from "react-hot-toast";
 import BlogManagement from "./pages/GiaoVien/BlogManagement";
+import { GVHomePage } from "./pages/GiaoVien/GVHomePage";
 
 export default function App() {
   return (
@@ -71,6 +72,7 @@ export default function App() {
               <Route path="/line-chart" element={<LineChart />} />
               <Route path="/bar-chart" element={<BarChart />} />
             </Route>
+            <Route path="/giaovien" element={<GVHomePage />} />
           </Route>
 
           {/* Auth Layout */}
