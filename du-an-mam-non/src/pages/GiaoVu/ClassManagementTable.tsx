@@ -11,7 +11,7 @@ import { DeleteUserIcon, EditUserIcon } from "../../icons";
 import Pagination from "../../components/common/Pagination";
 import { LevelsData } from "./GradeManagementTable";
 
-interface Teacher {
+export interface Teacher {
   id: string;
   fullName: string;
 }
