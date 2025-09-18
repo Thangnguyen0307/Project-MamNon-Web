@@ -27,6 +27,7 @@ import { Toaster } from "react-hot-toast";
 import BlogManagement from "./pages/GiaoVien/BlogManagement";
 
 import HomePage from "./pages/HomePage/HomePage";
+import { GVHomePage } from "./pages/GiaoVien/GVHomePage";
 
 
 
