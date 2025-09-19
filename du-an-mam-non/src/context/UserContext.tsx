@@ -13,11 +13,12 @@ export interface User {
   id: string;
   fullName: string;
   email: string;
+  role: string;
 }
 
 interface UserContextType {
   user: User | null;
-  updateUser: (userData: User) => void;
+  updateUser: (userData: User | null) => void;
   clearUser: () => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
@@ -34,7 +35,7 @@ interface UserProviderProps {
 const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const updateUser = useCallback((userData: User) => {
+  const updateUser = useCallback((userData: User | null) => {
     setUser(userData);
   }, []);
   const clearUser = useCallback(() => {

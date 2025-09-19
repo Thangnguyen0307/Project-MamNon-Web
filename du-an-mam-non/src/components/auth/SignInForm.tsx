@@ -17,6 +17,7 @@ export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const { updateUser } = useUser();
+  // const navigate = useNavigate();
   // Call API LOGIN
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,12 +40,12 @@ export default function SignInForm() {
         password,
       });
 
-      const { accessToken, refreshToken, data } = response.data;
+      const { accessToken, refreshToken, user } = response.data;
 
       if (accessToken) {
-        updateUser(data);
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+        updateUser(user);
       }
     } catch (error) {
       console.log(error);

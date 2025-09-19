@@ -25,67 +25,69 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 import PublicRoute from "./components/common/PublicRoute";
 import { Toaster } from "react-hot-toast";
 import BlogManagement from "./pages/GiaoVien/BlogManagement";
-
 import HomePage from "./pages/HomePage/HomePage";
-
-
+import { GVHomePage } from "./pages/GiaoVien/GVHomePage";
+import { GV_ClassList } from "./pages/GiaoVien/GV_ClassList";
+import GV_Blog_List from "./pages/GiaoVien/GV_Blog_List";
+import GV_AddBlog from "./pages/GiaoVien/GV_AddBlog";
 
 export default function App() {
   return (
     <>
       <Router>
-        
         <ScrollToTop />
         <Routes>
           {/* Dashboard Layout */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              <Route index path="/" element={<Home />} />
-
-              
-              
+          <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+            <Route element={<AppLayout />} path="/admin">
+              <Route path="home" element={<Home />} />
               {/* Giáo Vụ */}
-              <Route path="/gvuquanlynguoidung" element={<UserManagement />} />
-              <Route path="/gvuquanlylophoc" element={<ClassManagement />} />
-              <Route path="/gvuquanlykhoilop" element={<GradeManagement />} />
+              <Route path="gvuquanlynguoidung" element={<UserManagement />} />
+              <Route path="gvuquanlylophoc" element={<ClassManagement />} />
+              <Route path="gvuquanlykhoilop" element={<GradeManagement />} />
 
               {/* Giáo Viên */}
-              <Route path="/gvquanlyhoatdong" element={<BlogManagement />} />
+              <Route path="gvquanlyhoatdong" element={<BlogManagement />} />
 
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/blank" element={<Blank />} />
+              <Route path="calendar" element={<Calendar />} />
+              <Route path="blank" element={<Blank />} />
 
               {/* Others Page */}
-              <Route path="/profile" element={<UserProfiles />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/blank" element={<Blank />} />
+              <Route path="profile" element={<UserProfiles />} />
+              <Route path="calendar" element={<Calendar />} />
+              <Route path="blank" element={<Blank />} />
 
               {/* Forms */}
-              <Route path="/form-elements" element={<FormElements />} />
+              <Route path="form-elements" element={<FormElements />} />
 
               {/* Tables */}
-              <Route path="/basic-tables" element={<BasicTables />} />
+              <Route path="basic-tables" element={<BasicTables />} />
 
               {/* Ui Elements */}
-              <Route path="/alerts" element={<Alerts />} />
-              <Route path="/avatars" element={<Avatars />} />
-              <Route path="/badge" element={<Badges />} />
-              <Route path="/buttons" element={<Buttons />} />
-              <Route path="/images" element={<Images />} />
-              <Route path="/videos" element={<Videos />} />
+              <Route path="alerts" element={<Alerts />} />
+              <Route path="avatars" element={<Avatars />} />
+              <Route path="badge" element={<Badges />} />
+              <Route path="buttons" element={<Buttons />} />
+              <Route path="images" element={<Images />} />
+              <Route path="videos" element={<Videos />} />
 
               {/* Charts */}
-              <Route path="/line-chart" element={<LineChart />} />
-              <Route path="/bar-chart" element={<BarChart />} />
+              <Route path="line-chart" element={<LineChart />} />
+              <Route path="bar-chart" element={<BarChart />} />
             </Route>
-            <Route path="/giaovien" element={<GVHomePage />} />
           </Route>
-
+          <Route element={<ProtectedRoute allowedRoles={["TEACHER"]} />}>
+            <Route path="/giaovien" element={<GVHomePage />}>
+              <Route index element={<GV_ClassList />} />
+              <Route path="baiviet/:id" element={<GV_Blog_List />} />
+              <Route path="thembaiviet/:id" element={<GV_AddBlog />} />
+            </Route>
+          </Route>
           {/* HomePage   */}
-          <Route path="/homepage" element={<HomePage />} />
 
           {/* Auth Layout */}
           <Route element={<PublicRoute />}>
+            <Route path="/" element={<HomePage />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
           </Route>
@@ -97,7 +99,7 @@ export default function App() {
         position="bottom-right"
         toastOptions={{
           className: "",
-          style: { fontSize: "13px" },
+          style: { fontSize: "14px" },
         }}
       />
     </>

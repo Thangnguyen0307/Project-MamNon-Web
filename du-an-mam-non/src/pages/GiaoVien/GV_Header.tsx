@@ -17,12 +17,12 @@ const GV_Header: React.FC = () => {
         <nav className="hidden md:flex gap-4 absolute left-1/2 -translate-x-1/2">
           <Link
             className="px-4 py-2 rounded-lg text-black hover:bg-gray-100/80 transition "
-            to={""}>
+            to={"/giaovien"}>
             Danh Sách Lớp Học
           </Link>
           <Link
             className="px-4 py-2 rounded-lg text-black hover:bg-gray-100/80 transition"
-            to={""}>
+            to={"/"}>
             Bài viết
           </Link>
           <Link

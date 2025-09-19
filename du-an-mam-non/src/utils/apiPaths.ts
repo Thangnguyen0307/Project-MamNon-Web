@@ -36,6 +36,7 @@ export const API_PATHS = {
     DETAIL_CLASSES: (id: string) => `api/classes/${id}`,
     UPDATE_CLASSES: (id: string) => `api/classes/${id}`,
     DELETE_CLASSES: (id: string) => `api/classes/${id}`,
+    GET_CLASSES_BY_TEACHER: "api/classes/user",
   },
   BLOG: {
     GET_ALL_BLOGS: "api/blogs",
