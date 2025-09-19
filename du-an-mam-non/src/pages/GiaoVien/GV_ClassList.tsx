@@ -23,7 +23,6 @@ export const GV_ClassList = () => {
       const response = await axiosInstance.get(
         API_PATHS.CLASSES.GET_CLASSES_BY_TEACHER
       );
-      console.log(response);
 
       if (response.data.data.classes?.length > 0) {
         setClassesData(response.data.data.classes);
@@ -66,12 +65,16 @@ export const GV_ClassList = () => {
                       <Link
                         to={`/giaovien/baiviet/${classItem.id}`}
                         className="mx-1">
-                        <Button size="sm">Xem bài viết</Button>
+                        <Button variant="yellow" size="sm">
+                          Xem bài viết
+                        </Button>
                       </Link>
                       <Link
                         to={`/giaovien/thembaiviet/${classItem.id}`}
                         className="mx-1">
-                        <Button size="sm">Thêm bài viết</Button>
+                        <Button variant="orange" size="sm">
+                          Thêm bài viết
+                        </Button>
                       </Link>
                     </div>
                   </div>

@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
 import TextArea from "../../components/form/input/TextArea";
@@ -19,11 +19,11 @@ interface Blog {
 }
 
 const GV_AddBlog = () => {
-  const { id } = useParams<{ id: string }>();
+  const { classId } = useParams();
   const [blogData, setBlogData] = useState<Blog>({
     title: "",
     content: "",
-    class: id as string,
+    class: classId as string,
     images: [],
   });
 
@@ -36,7 +36,7 @@ const GV_AddBlog = () => {
   const handleFileChange = (files: FileList | null) => {
     if (!files) return;
     const selected = Array.from(files);
-    if (blogData.images.length >= 10) {
+    if (blogData.images?.length >= 10) {
       toast.error("Vui lòng chọn tối đa 10 ảnh!!");
     } else {
       setBlogData((prev) => ({
@@ -52,7 +52,7 @@ const GV_AddBlog = () => {
       const formData = new FormData();
       formData.append("title", blogData.title);
       formData.append("content", blogData.content);
-      formData.append("class", id as string);
+      formData.append("class", classId as string);
 
       if (blogData.images && blogData.images.length > 0) {
         blogData.images.forEach((file) => {
@@ -149,10 +149,15 @@ const GV_AddBlog = () => {
               </div>
             </ComponentCard>
           </div>
-          <div className="flex items-center">
-            <Button className="" onClick={createBlogFormData}>
+          <div className="flex items-center gap-3">
+            <Button size="sm" variant="orange" onClick={createBlogFormData}>
               Tạo bài viết
             </Button>
+            <Link to={"/giaovien"}>
+              <Button size="sm" variant="yellow" className="">
+                Quay về
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

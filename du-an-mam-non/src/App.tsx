@@ -30,6 +30,7 @@ import { GVHomePage } from "./pages/GiaoVien/GVHomePage";
 import { GV_ClassList } from "./pages/GiaoVien/GV_ClassList";
 import GV_Blog_List from "./pages/GiaoVien/GV_Blog_List";
 import GV_AddBlog from "./pages/GiaoVien/GV_AddBlog";
+import GV_EditBlog from "./pages/GiaoVien/GV_EditBlog";
 
 export default function App() {
   return (
@@ -79,8 +80,12 @@ export default function App() {
           <Route element={<ProtectedRoute allowedRoles={["TEACHER"]} />}>
             <Route path="/giaovien" element={<GVHomePage />}>
               <Route index element={<GV_ClassList />} />
-              <Route path="baiviet/:id" element={<GV_Blog_List />} />
-              <Route path="thembaiviet/:id" element={<GV_AddBlog />} />
+              <Route path="baiviet/:classId" element={<GV_Blog_List />} />
+              <Route path="thembaiviet/:classId" element={<GV_AddBlog />} />
+              <Route
+                path="chinhsuabaiviet/:classId/:blogId"
+                element={<GV_EditBlog />}
+              />
             </Route>
           </Route>
           {/* HomePage   */}

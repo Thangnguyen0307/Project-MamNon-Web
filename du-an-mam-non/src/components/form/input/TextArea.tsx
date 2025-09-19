@@ -15,7 +15,8 @@ interface TextareaProps {
 const TextArea: React.FC<TextareaProps> = ({
   name,
   placeholder = "Enter your message", // Default placeholder
-  rows = 3, // Default number of rows
+  rows = 3,
+  value, // Default number of rows
   onChange, // Callback for changes
   className = "", // Additional custom styles
   disabled = false, // Disabled state
@@ -36,6 +37,7 @@ const TextArea: React.FC<TextareaProps> = ({
     <div className="relative">
       <textarea
         name={name}
+        value={value}
         placeholder={placeholder}
         rows={rows}
         onChange={onChange ? (e) => onChange(e) : undefined}
