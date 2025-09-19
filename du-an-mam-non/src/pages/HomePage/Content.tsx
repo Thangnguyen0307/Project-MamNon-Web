@@ -50,11 +50,11 @@ const Content = () => {
   };
 
   return (
-    <section className="max-w-5xl mx-auto py-12 px-4 flex flex-col gap-10">
+    <section className="max-w-[1600px] mx-auto py-12 px-4 flex flex-col gap-10">
       {/* Landing với slide ảnh đẹp */}
       <div className="w-full flex flex-col items-center mb-8">
         <div
-          className="relative w-full max-w-7xl h-[520px] rounded-2xl overflow-hidden shadow-2xl"
+          className="relative w-full max-w-5xl h-[500px] rounded-2xl overflow-hidden shadow-2xl"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           onMouseDown={handleTouchStart}
@@ -73,7 +73,7 @@ const Content = () => {
             />
           ))}
           {/* 3 chấm phía dưới slide luôn hiển thị */}
-          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
             {slides.map((_, idx) => (
               <span
                 key={idx}
@@ -92,27 +92,74 @@ const Content = () => {
         </div>
       </div>
       {/* Hình ảnh minh họa và giới thiệu trường */}
-      <div className="flex flex-col md:flex-row items-center gap-10">
-        <div className="flex-1 flex justify-center">
+      <div className="flex flex-col md:flex-row items-stretch gap-10">
+        {/* Ảnh minh họa */}
+        <div className="flex-1 flex justify-center items-stretch">
           <img
             src="/images/homepage/anhHome.jpg"
             alt="Đồ chơi trường mầm non"
-            className="w-[550px] h-auto rounded-xl shadow-lg object-cover"
+            className="h-full rounded-2xl shadow-2xl object-cover border-4 border-[#F3E8FF]"
           />
         </div>
-        <div className="flex-1">
-          <h2 className="text-3xl font-bold text-[#7F55B1] mb-4">Giới thiệu về Mầm Non ABC</h2>
-          <p className="text-lg text-gray-700 mb-4">
-            Trường Mầm Non ABC là môi trường giáo dục thân thiện, hiện đại, nơi các bé được vui chơi, học tập và phát triển toàn diện. 
+        {/* Giới thiệu trường */}
+        <div className="flex-1 flex flex-col justify-center">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-[#7F55B1] mb-4 drop-shadow">
+            Giới thiệu về Mầm Non ABC
+          </h2>
+          <p className="text-lg md:text-xl text-gray-700 mb-4 leading-relaxed">
+            Trường Mầm Non ABC là môi trường giáo dục thân thiện, hiện đại, nơi các bé được vui chơi, học tập và phát triển toàn diện.
             Với đội ngũ giáo viên giàu kinh nghiệm, chương trình học phong phú, cơ sở vật chất an toàn, trường luôn tạo điều kiện tốt nhất để các bé khám phá thế giới xung quanh.
           </p>
-          <ul className="list-disc pl-5 text-gray-700">
+          <ul className="list-disc pl-5 text-gray-700 space-y-2 text-base md:text-lg">
             <li>Không gian lớp học sáng tạo, nhiều đồ chơi phát triển trí tuệ.</li>
             <li>Hoạt động ngoại khóa đa dạng, giúp bé tự tin và năng động.</li>
             <li>Chăm sóc sức khỏe, dinh dưỡng khoa học cho từng bé.</li>
             <li>Phối hợp chặt chẽ với phụ huynh trong quá trình giáo dục.</li>
           </ul>
         </div>
+      </div>
+
+      {/* Đăng ký tư vấn tách riêng dưới phần giới thiệu */}
+      <div className="flex flex-col items-center p-8 mt-8 w-full max-w-2xl mx-auto">
+        <span className="font-bold text-2xl md:text-3xl text-[#F97A00] mb-2 text-center tracking-wide">
+          ĐĂNG KÝ TƯ VẤN
+        </span>
+        <div className="w-20 h-2 bg-[#FFD966] rounded-full mb-6" />
+        <form className="flex flex-col items-center justify-center w-full gap-4">
+          <input
+            type="text"
+            placeholder="Họ và tên"
+            className="w-full h-12 rounded-2xl px-5 text-base shadow-md border border-[#FFD966] outline-none transition focus:ring-2 focus:ring-[#F97A00] focus:bg-white"
+            style={{
+              boxShadow: "0 4px 12px 0 #D4CDE1",
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Số điện thoại"
+            className="w-full h-12 rounded-2xl px-5 text-base shadow-md border border-[#FFD966] outline-none transition focus:ring-2 focus:ring-[#F97A00] focus:bg-white"
+            style={{
+              boxShadow: "0 4px 12px 0 #D4CDE1",
+            }}
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full h-12 rounded-2xl px-5 text-base shadow-md border border-[#FFD966] outline-none transition focus:ring-2 focus:ring-[#F97A00] focus:bg-white"
+            style={{
+              boxShadow: "0 4px 12px 0 #D4CDE1",
+            }}
+          />
+          <button
+            className="w-full h-12 bg-[#F97A00] text-white font-bold text-xl rounded-2xl shadow-lg hover:bg-white hover:text-[#F97A00] border-2 border-[#F97A00] transition mt-2"
+            type="submit"
+          >
+            GỬI
+          </button>
+        </form>
+        <span className="text-sm text-gray-500 mt-4 text-center">
+          Chúng tôi sẽ liên hệ lại với bạn sớm nhất!
+        </span>
       </div>
     </section>
   );
