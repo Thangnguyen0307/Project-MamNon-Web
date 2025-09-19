@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { BlogsManagementTable } from "./BlogManagementTable";
 import BlogManagementFilter from "./BlogManagementFilter";
 
-const BlogManagement: React.FC = () => {
+const BlogManagement = () => {
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedItem, setSelectedItem] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
