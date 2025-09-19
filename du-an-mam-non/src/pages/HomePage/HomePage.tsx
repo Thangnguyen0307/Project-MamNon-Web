@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import { ArrowUpCircle } from "lucide-react";
+import Content from "./Content";
 
 const HomePage = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -27,7 +28,8 @@ const HomePage = () => {
         <Header />
       </div>
       {/* Để tránh che nội dung, thêm padding-top bằng chiều cao header */}
-      <div className="pt-[1000px]">
+      <div className="pt-[250px]">
+        <Content />
         <Footer />
       </div>
       {showScrollTop && (
