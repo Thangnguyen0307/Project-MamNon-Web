@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Lightbox from "yet-another-react-lightbox";
+import Lightbox, { SlideImage } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
@@ -8,6 +8,13 @@ import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { Link, useParams } from "react-router";
 import Button from "../../components/ui/button/Button";
+import VideoPlayer from "../../components/common/VideoPlayer";
+
+interface VideoSlide {
+  type: "video";
+  src: string;
+}
+type CustomSlide = SlideImage | VideoSlide;
 
 export interface Author {
   id: string;
@@ -26,11 +33,18 @@ interface ClassInfo {
   level: Level;
 }
 
+interface VideoInfo {
+  _id: string;
+  m3u8: string;
+  thumbnail: string;
+}
+
 export interface BlogsData {
   _id: string;
   title: string;
   content: string;
   images: string[];
+  videos: VideoInfo[];
   author: Author;
   class: ClassInfo;
   createdAt: string;
@@ -44,7 +58,7 @@ const GV_Blog_List: React.FC = () => {
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [blogsData, setBlogsData] = useState<BlogsData[]>([]);
-  const [currentSlides, setCurrentSlides] = useState<{ src: string }[]>([]);
+  const [currentSlides, setCurrentSlides] = useState<CustomSlide[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -81,48 +95,62 @@ const GV_Blog_List: React.FC = () => {
     return blogs.map((blog) => ({
       ...blog,
       images: blog.images?.map((img) => `${BASE_MEDIA_URL}${img}`) || [],
+      videos:
+        blog.videos?.map((video) => ({
+          ...video,
+          m3u8: `${BASE_MEDIA_URL}${video.m3u8}`,
+        })) || [],
     }));
   };
 
-  const renderPhoto = (images: string[]) => {
-    if (images.length === 0) return null;
+  console.log(currentSlides);
 
-    if (images.length === 1) {
-      return (
-        <div
-          className="cursor-pointer"
-          onClick={() => {
-            setCurrentSlides(images.map((src) => ({ src })));
-            setIndex(0);
-            setOpen(true);
-          }}>
-          <img
-            src={images[0]}
-            alt="Photo 0"
-            className="w-full aspect-video object-cover rounded-lg"
-          />
-        </div>
-      );
-    }
+  const buildAllMedia = (
+    images: string[] | null,
+    videos: VideoInfo[] | null
+  ) => {
+    return [
+      ...(images || []).map((u) => ({ src: u, type: "image" as const })),
+      ...(videos || []).map((v) => ({ src: v.m3u8, type: "video" as const })),
+    ];
+  };
 
-    const extraCount = images.length - 1;
+  const renderMedia = (images: string[] | null, videos: VideoInfo[] | null) => {
+    const allMedia = buildAllMedia(images, videos);
 
+    if (allMedia.length === 0) return null;
+    const totalExtra = allMedia.length - 1;
     return (
       <div
         className="relative cursor-pointer"
         onClick={() => {
-          setCurrentSlides(images.map((src) => ({ src })));
+          const slides = allMedia.map((m) => ({
+            src: m.src,
+            type: m.type,
+          }));
+          setCurrentSlides(slides as unknown as CustomSlide[]);
           setIndex(0);
           setOpen(true);
         }}>
-        <img
-          src={images[0]}
-          alt="Photo 0"
-          className="w-full aspect-video object-cover rounded-lg opacity-50"
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-white text-3xl font-bold">+{extraCount}</span>
-        </div>
+        {allMedia[0].type === "video" ? (
+          <VideoPlayer
+            src={allMedia[0].src}
+            className="w-full aspect-video object-cover rounded-lg"
+            controls
+          />
+        ) : (
+          <img
+            src={allMedia[0].src}
+            alt="media preview"
+            className="w-full aspect-video object-cover rounded-lg"
+          />
+        )}
+
+        {totalExtra > 0 && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+            <span className="text-white text-3xl font-bold">+{totalExtra}</span>
+          </div>
+        )}
       </div>
     );
   };
@@ -186,8 +214,8 @@ const GV_Blog_List: React.FC = () => {
                 </p>
               </div>
 
-              {/* Photos */}
-              <div>{renderPhoto(blog.images)}</div>
+              {/* Media */}
+              <div>{renderMedia(blog.images, blog.videos)}</div>
             </div>
           </div>
         ))
@@ -201,7 +229,29 @@ const GV_Blog_List: React.FC = () => {
         open={open}
         close={() => setOpen(false)}
         index={index}
-        slides={currentSlides}
+        slides={currentSlides as unknown as SlideImage[]}
+        render={{
+          slide: ({ slide }) => {
+            const s = slide as CustomSlide;
+            if (s.type === "video") {
+              return (
+                <VideoPlayer
+                  src={slide.src}
+                  className="max-h-full max-w-full"
+                  controls
+                  autoPlay
+                />
+              );
+            }
+            return (
+              <img
+                src={slide.src}
+                alt="media"
+                className="max-h-full max-w-full object-contain"
+              />
+            );
+          },
+        }}
       />
     </div>
   );

@@ -45,4 +45,8 @@ export const API_PATHS = {
     UPDATE_BLOG: (id: string) => `api/blogs/${id}`,
     DELETE_BLOG: (id: string) => `api/blogs/${id}`,
   },
+  VIDEO: {
+    INIT_VIDEO: "api/videos/init",
+    UPLOAD_CHUNK: (id: string) => `api/videos/${id}/chunk`,
+  },
 };
