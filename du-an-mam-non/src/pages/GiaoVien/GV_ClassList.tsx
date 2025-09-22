@@ -47,7 +47,7 @@ export const GV_ClassList = () => {
                 <div
                   className="card bg-base-100 border-4 border-dashed border-[#D18109]/20 overflow-hidden rounded-3xl bg-amber-50"
                   key={index}>
-                  <figure className="">
+                  <figure className="transition-transform duration-300 ease-in-out hover:scale-110">
                     <img
                       src="https://wordpress.vecurosoft.com/toddly/wp-content/uploads/2025/08/vs-class-p-1-5.jpg"
                       alt="Shoes"

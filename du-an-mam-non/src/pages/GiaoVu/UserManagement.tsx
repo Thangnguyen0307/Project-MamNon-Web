@@ -239,19 +239,33 @@ const UserManagement = () => {
               <div className="custom-scrollbar overflow-y-auto px-2 pb-3">
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5">
                   {!selectedItem && (
-                    <div>
-                      <Label>Email</Label>
-                      <Input
-                        name="email"
-                        type="text"
-                        placeholder="Vui lòng nhập email"
-                        onChange={({ target }) => {
-                          handleValueChange(target.name, target.value);
-                        }}
-                        className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        required={true}
-                      />
-                    </div>
+                    <>
+                      <div>
+                        <Label>Email</Label>
+                        <Input
+                          name="email"
+                          type="text"
+                          placeholder="Vui lòng nhập email"
+                          onChange={({ target }) => {
+                            handleValueChange(target.name, target.value);
+                          }}
+                          className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          required={true}
+                        />
+                      </div>
+                      <div>
+                        <Label>Role</Label>
+                        <Select
+                          name="role"
+                          options={optionsRole}
+                          placeholder="Vui lòng chọn cấp bậc thái người dùng"
+                          onChange={(name, value) =>
+                            handleValueChange(name, value)
+                          }
+                          className="dark:bg-dark-900  "
+                        />
+                      </div>
+                    </>
                   )}
                   {selectedItem && (
                     <>

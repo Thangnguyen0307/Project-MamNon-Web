@@ -8,6 +8,9 @@ import {
 import dayjs from "dayjs";
 import { DeleteUserIcon, EditUserIcon } from "../../icons";
 import Pagination from "../../components/common/Pagination";
+import ConfirmDeleteModal from "../../components/common/ConfirmDeleteModal";
+import { useState } from "react";
+import Tooltip from "../../components/common/Tooltip";
 
 export interface LevelsData {
   id: string;
@@ -38,6 +41,18 @@ export const GradeManagementTable: React.FC<TableProps> = ({
   setPage,
   pagination,
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const handleOpenDelete = (id: string) => {
+    setDeleteId(id);
+    setIsModalOpen(true);
+  };
+  const handleDelete = () => {
+    if (!deleteId) return;
+    deleteData(deleteId);
+    setDeleteId(null);
+    setIsModalOpen(false);
+  };
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
@@ -85,16 +100,20 @@ export const GradeManagementTable: React.FC<TableProps> = ({
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                     <div className="flex items-center gap-5">
-                      <span
-                        className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
-                        onClick={() => modalUpdate(item.id)}>
-                        <EditUserIcon />
-                      </span>
-                      <span
-                        className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
-                        onClick={() => deleteData(item.id)}>
-                        <DeleteUserIcon />
-                      </span>
+                      <Tooltip text="Chỉnh sủa">
+                        <span
+                          className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
+                          onClick={() => modalUpdate(item.id)}>
+                          <EditUserIcon />
+                        </span>
+                      </Tooltip>
+                      <Tooltip text="Xoá">
+                        <span
+                          className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
+                          onClick={() => handleOpenDelete(item.id)}>
+                          <DeleteUserIcon />
+                        </span>
+                      </Tooltip>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -109,6 +128,11 @@ export const GradeManagementTable: React.FC<TableProps> = ({
           )}
         </Table>
         {/* Pagination */}
+        <ConfirmDeleteModal
+          isOpen={isModalOpen}
+          onConfirm={handleDelete}
+          onCancel={() => setIsModalOpen(false)}
+        />
         <Pagination
           total={pagination.total}
           limit={pagination.limit}

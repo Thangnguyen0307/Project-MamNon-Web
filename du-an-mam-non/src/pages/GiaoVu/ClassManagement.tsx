@@ -360,7 +360,6 @@ const ClassManagement: React.FC = () => {
                               handleValueChange(target.name, target.value);
                             }}
                             disabled
-                            required
                           />
                         </div>
                         <div>
@@ -377,7 +376,6 @@ const ClassManagement: React.FC = () => {
                               handleValueChange(target.name, target.value);
                             }}
                             disabled
-                            required
                           />
                         </div>
                       </>

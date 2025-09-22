@@ -232,7 +232,7 @@ const AppSidebar: React.FC = () => {
         className={`py-8 flex ${
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}>
-        <Link to="/">
+        {/* <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img
@@ -258,6 +258,9 @@ const AppSidebar: React.FC = () => {
               height={32}
             />
           )}
+        </Link> */}
+        <Link className="text-xl font-bold" to="/admin/home">
+          QUẢN LÝ MẦM NON
         </Link>
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
@@ -271,7 +274,7 @@ const AppSidebar: React.FC = () => {
                     : "justify-start"
                 }`}>
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
+                  "Danh mục"
                 ) : (
                   <HorizontaLDots className="size-6" />
                 )}

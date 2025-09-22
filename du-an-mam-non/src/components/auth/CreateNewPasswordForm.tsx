@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
@@ -7,51 +7,48 @@ import Button from "../ui/button/Button";
 import { validateEmail } from "../../utils/helper";
 import { API_PATHS } from "../../utils/apiPaths";
 import { axiosInstance } from "../../utils/axiosInstance";
-import { useUser } from "../../context/UserContext";
+import { AxiosError } from "axios";
 
-export default function SignInForm() {
+export default function CreateNewPasswordForm() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [otpCode, setotpCode] = useState("");
+  const [newPassword, setnewPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { updateUser } = useUser();
-  // const navigate = useNavigate();
-  // Call API LOGIN
+
+  const navigate = useNavigate();
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
-      setError("Vui lòng nhập email đúng định dạng abc@example");
-      return;
-    }
-
-    if (!password) {
-      setError("Vui lòng nhập mật khẩu");
+      setError("Please enter a valid email address");
       return;
     }
 
     setError("");
 
     try {
-      const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
+      const response = await axiosInstance.put(API_PATHS.AUTH.RESET_PASSWORD, {
         email,
-        password,
+        otpCode,
+        newPassword,
       });
 
-      const { accessToken, refreshToken, user } = response.data;
-
-      if (accessToken) {
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        updateUser(user);
+      if (response.data) {
+        console.log(response.data);
+        navigate("/signin");
       }
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      if (error.response && error.response.data.message) {
+        setError(error.response.data.message);
+      }
     }
   };
 
   return (
-    <div className="flex flex-col flex-1  rounded-2xl">
+    <div className="flex flex-col flex-1">
       <div className="w-full max-w-md pt-10 mx-auto">
         <Link
           to="/"
@@ -60,14 +57,14 @@ export default function SignInForm() {
           Trang chủ
         </Link>
       </div>
-      <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto ">
-        <div className="border border-gray-200 rounded-2xl shadow-2xl p-5">
+      <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
+        <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Đăng nhập
+              Tạo mật khẩu mới
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Nhập mật khẩu và tài khoản đã được cấp
+              Vui lòng tạo mật khẩu mới để từ mã OTP đã cấp qua gmail
             </p>
           </div>
           <div>
@@ -85,14 +82,24 @@ export default function SignInForm() {
                 </div>
                 <div>
                   <Label>
-                    Mật khẩu <span className="text-error-500">*</span>{" "}
+                    OTP Code <span className="text-error-500">*</span>{" "}
+                  </Label>
+                  <Input
+                    placeholder="info@gmail.com"
+                    value={otpCode}
+                    onChange={({ target }) => setotpCode(target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>
+                    Mật khẩu mới<span className="text-error-500">*</span>{" "}
                   </Label>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Vui lòng nhập mật khẩu"
-                      value={password}
-                      onChange={({ target }) => setPassword(target.value)}
+                      placeholder="Nhập mật khẩu mới"
+                      value={newPassword}
+                      onChange={({ target }) => setnewPassword(target.value)}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -108,16 +115,9 @@ export default function SignInForm() {
                 {error && (
                   <p className="text-red-500 text-xs pb-2.5">{error}</p>
                 )}
-                <div className="flex items-center justify-between">
-                  <Link
-                    to="/resetpassword"
-                    className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400">
-                    Quên mật khẩu ?
-                  </Link>
-                </div>
                 <div>
                   <Button className="w-full" size="sm" type="submit">
-                    Đăng nhập
+                    Tạo mật khẩu mới
                   </Button>
                 </div>
               </div>
