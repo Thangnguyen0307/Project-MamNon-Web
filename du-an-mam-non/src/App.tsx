@@ -9,15 +9,24 @@ import GradeManagement from "./pages/GiaoVu/GradeManagement";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import PublicRoute from "./components/common/PublicRoute";
 import { Toaster } from "react-hot-toast";
-import HomePage from "./pages/HomePage/HomePage";
+
+import BlogManagement from "./pages/GiaoVien/BlogManagement";
+// import HomePage from "./pages/HomePage/HomePage";
+
+
+
 import { GVHomePage } from "./pages/GiaoVien/GVHomePage";
 import { GV_ClassList } from "./pages/GiaoVien/GV_ClassList";
 import GV_Blog_List from "./pages/GiaoVien/GV_Blog_List";
 import GV_AddBlog from "./pages/GiaoVien/GV_AddBlog";
 import GV_EditBlog from "./pages/GiaoVien/GV_EditBlog";
+
+import Homepage2 from "./pages/HomePage2/Homepage2";
+
 import UserProfiles from "./pages/UserProfiles";
 import ResetPassword from "./pages/AuthPages/ResetPassword";
 import CreateNewPassword from "./pages/AuthPages/CreateNewPassword";
+
 
 export default function App() {
   return (
@@ -52,7 +61,7 @@ export default function App() {
 
           {/* Auth Layout */}
           <Route element={<PublicRoute />}>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<Homepage2 />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/resetpassword" element={<ResetPassword />} />
             <Route path="/createnewpassword" element={<CreateNewPassword />} />
