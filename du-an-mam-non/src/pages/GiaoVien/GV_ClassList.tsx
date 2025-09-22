@@ -39,6 +39,17 @@ export const GV_ClassList = () => {
 
   return (
     <div>
+      <p
+        className="text-center pt-5
+        text-3xl font-medium text-3xl font-bold text-[#fcb900]
+        transition-all duration-500 cursor-pointer 
+        hover:scale-110 
+        hover:text-transparent hover:bg-clip-text 
+        hover:bg-gradient-to-r hover:from-pink-400 hover:via-yellow-400 hover:to-green-400
+        drop-shadow-md 
+      ">
+        DANH SÁCH LỚP HỌC
+      </p>
       <div className="">
         <div className="max-w-7xl mx-auto px-4 py-10">
           {classesData?.length > 0 ? (

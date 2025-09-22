@@ -15,8 +15,7 @@ export default function SignInForm() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { updateUser } = useUser();
-  // const navigate = useNavigate();
-  // Call API LOGIN
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -61,7 +60,7 @@ export default function SignInForm() {
         </Link>
       </div>
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto ">
-        <div className="border border-gray-200 rounded-2xl shadow-2xl p-5">
+        <div className="border border-gray-200 rounded-2xl shadow-2xl p-5 bg-white">
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
               Đăng nhập

@@ -10,10 +10,7 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 import PublicRoute from "./components/common/PublicRoute";
 import { Toaster } from "react-hot-toast";
 
-import BlogManagement from "./pages/GiaoVien/BlogManagement";
 // import HomePage from "./pages/HomePage/HomePage";
-
-
 
 import { GVHomePage } from "./pages/GiaoVien/GVHomePage";
 import { GV_ClassList } from "./pages/GiaoVien/GV_ClassList";
@@ -26,7 +23,6 @@ import Homepage2 from "./pages/HomePage2/Homepage2";
 import UserProfiles from "./pages/UserProfiles";
 import ResetPassword from "./pages/AuthPages/ResetPassword";
 import CreateNewPassword from "./pages/AuthPages/CreateNewPassword";
-
 
 export default function App() {
   return (
