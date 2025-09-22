@@ -9,6 +9,7 @@ import {
 import { DeleteUserIcon, EditUserIcon } from "../../icons";
 import Pagination from "../../components/common/Pagination";
 import Badge from "../../components/ui/badge/Badge";
+import Tooltip from "../../components/common/Tooltip";
 
 export interface UserData {
   id: string;
@@ -98,16 +99,20 @@ export const UserManagementTable: React.FC<TableProps> = ({
                   </TableCell>
                   <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">
                     <div className="flex items-center gap-5">
-                      <span
-                        className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
-                        onClick={() => modalUpdate(item.id, "changeRole")}>
-                        <EditUserIcon />
-                      </span>
-                      <span
-                        className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
-                        onClick={() => modalUpdate(item.id, "changeStatus")}>
-                        <DeleteUserIcon />
-                      </span>
+                      <Tooltip text="Phân quyền">
+                        <span
+                          className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
+                          onClick={() => modalUpdate(item.id, "changeRole")}>
+                          <EditUserIcon />
+                        </span>
+                      </Tooltip>
+                      <Tooltip text="Trạng thái">
+                        <span
+                          className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
+                          onClick={() => modalUpdate(item.id, "changeStatus")}>
+                          <DeleteUserIcon />
+                        </span>
+                      </Tooltip>
                     </div>
                   </TableCell>
                 </TableRow>

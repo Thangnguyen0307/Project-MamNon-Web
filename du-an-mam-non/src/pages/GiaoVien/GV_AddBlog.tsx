@@ -70,7 +70,7 @@ const GV_AddBlog = () => {
         }
       );
 
-      if (response.data?.length > 0) {
+      if (response.data) {
         toast.success("Tạo bài viết thành công  ");
       }
     } catch (error) {

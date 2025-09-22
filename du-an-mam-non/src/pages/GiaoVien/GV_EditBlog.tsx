@@ -110,7 +110,7 @@ const GV_EditBlog = () => {
         }
       );
 
-      if (response) {
+      if (response.data) {
         toast.success("Cập nhật bài viết thành công  ");
       }
     } catch (error) {
