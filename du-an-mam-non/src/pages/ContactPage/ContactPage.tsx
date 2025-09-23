@@ -32,7 +32,6 @@ const ContactPage = () => {
       <Header2 />
       <div className="pt-[180px] max-w-6xl mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-12">
-          {/* Thông tin liên hệ (giống Footer) */}
           <div className="flex-1">
             <h2 className="text-4xl font-extrabold text-[#7F55B1] mb-2">KidsMona Preschool</h2>
             <div className="text-base text-gray-600 mb-4">Nơi bé lớn lên mỗi ngày</div>
@@ -43,7 +42,6 @@ const ContactPage = () => {
               <div className="font-bold text-[#341D4E]">Giờ mở cửa: <span className="font-normal">Thứ 2 - Thứ 7, 7:00 - 17:00</span></div>
             </div>
           </div>
-          {/* Form đăng ký tư vấn */}
           <div className="flex-1 flex flex-col items-center">
             <h2 className="text-2xl font-bold text-[#88CE58] mb-2">ĐĂNG KÝ TƯ VẤN</h2>
             <div className="w-16 h-2 bg-[#FFD966] rounded-full mb-6" />
