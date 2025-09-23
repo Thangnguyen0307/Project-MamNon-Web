@@ -43,7 +43,12 @@ const Landing: React.FC<PropLanding> = ({ heightLanding }) => {
   return (
     <div
       className="w-full flex items-center justify-center bg-white overflow-hidden"
+
+      
+    
+
       style={{ minHeight: `calc(100vh - ${heightLanding}px)` }}>
+
       <div
         className="relative w-full h-full rounded-none overflow-hidden shadow-2xl"
         style={{ height: `calc(100vh - ${heightLanding}px)` }}
