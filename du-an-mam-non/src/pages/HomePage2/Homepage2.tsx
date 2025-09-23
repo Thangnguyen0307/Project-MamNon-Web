@@ -7,7 +7,7 @@ const Homepage2 = () => {
   return (
     <div>
       {/* Chỉ còn header và nội dung, không còn top bar */}
-      <div className="pt-[80px]">
+      <div className="">
         <Header2 />
         <Landing />
         <About />

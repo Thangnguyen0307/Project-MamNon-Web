@@ -41,7 +41,7 @@ const Landing = () => {
   return (
     <div
       className="w-full flex items-center justify-center bg-white overflow-hidden"
-      style={{ minHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+      style={{ minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`, marginTop: HEADER_HEIGHT }}
     >
       <div
         className="relative w-full h-full rounded-none overflow-hidden shadow-2xl"

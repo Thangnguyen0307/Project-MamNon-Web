@@ -1,8 +1,8 @@
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-b from-[#E3F7FA] to-[#F7FBFC] pb-10 font-[Quicksand,sans-serif]">
-      {/* Viền tím phía trên */}
-      <div className="w-full h-[8px] bg-[#7F55B1] mb-8" />
+    <>
+      <footer className="bg-[#E6D6F3] pb-10 font-[Quicksand,sans-serif]">
+  {/* Viền tím phía trên đã bị xóa theo yêu cầu */}
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start justify-between px-4 md:px-12 gap-8">
         {/* Logo & tên trường */}
         <div className="flex-1 flex flex-col items-start justify-center">
@@ -88,7 +88,18 @@ const Footer = () => {
           Quyết định thành lập: Số 123/QĐ-UBND do UBND Huyện Bình Chánh cấp ngày 01/01/2020
         </span>
       </div>
-    </footer>
+
+      </footer>
+      {/* Bar thông tin ngoài và dưới footer */}
+      <div className="hidden lg:flex bg-[#6C4CD6] w-full h-[48px] items-center justify-end px-10 text-white text-sm font-semibold">
+        <span className="mr-8">
+          <span className="font-bold">EMAIL :</span> info@themona.global
+        </span>
+        <span>
+          <span className="font-bold">HOTLINE :</span> (+84) 313-728-397
+        </span>
+      </div>
+    </>
   );
 };
 
