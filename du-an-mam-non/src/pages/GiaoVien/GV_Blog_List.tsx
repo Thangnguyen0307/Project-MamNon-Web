@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { Link, useParams } from "react-router";
 import VideoPlayer from "../../components/common/VideoPlayer";
+import { motion } from "framer-motion";
 
 interface VideoSlide {
   type: "video";
@@ -109,7 +110,10 @@ const GV_Blog_List: React.FC = () => {
   ) => {
     return [
       ...(images || []).map((u) => ({ src: u, type: "image" as const })),
-      ...(videos || []).map((v) => ({ src: v.m3u8, type: "video" as const })),
+      ...(videos || []).map((v) => ({
+        src: v.m3u8,
+        type: "video" as const,
+      })),
     ];
   };
 
@@ -171,7 +175,7 @@ const GV_Blog_List: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#F6F1E4]">
+    <div className="">
       {/* Header */}
       {blogsData?.length > 0 ? (
         blogsData.map((blog: BlogsData) => (
@@ -242,6 +246,22 @@ const GV_Blog_List: React.FC = () => {
           Chưa có bài viết nào
         </p>
       )}
+
+      <motion.div
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="fixed bottom-4 right-4 z-50">
+        <Link
+          to={`/giaovien/thembaiviet/${classId}`}
+          className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-orange-600 transition duration-300
+          text-sm md:text-base md:px-5 md:py-3">
+          <span className="text-lg md:text-xl">➕</span>
+          <span className="font-semibold hidden sm:inline">Thêm bài viết</span>
+        </Link>
+      </motion.div>
       {/* Lightbox */}
       <Lightbox
         open={open}

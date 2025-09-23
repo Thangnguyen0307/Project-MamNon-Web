@@ -6,9 +6,11 @@ const slides = [
   "/images/homepage/slide3.jpg",
 ];
 
-const HEADER_HEIGHT = 250; // px
+interface PropLanding {
+  heightLanding: string;
+}
 
-const Landing = () => {
+const Landing: React.FC<PropLanding> = ({ heightLanding }) => {
   const [current, setCurrent] = useState(0);
   const startX = useRef<number | null>(null);
 
@@ -41,10 +43,10 @@ const Landing = () => {
   return (
     <div
       className="w-full flex items-center justify-center bg-white overflow-hidden"
-      style={{ minHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
+      style={{ minHeight: `calc(100vh - ${heightLanding}px)` }}>
       <div
         className="relative w-full h-full rounded-none overflow-hidden shadow-2xl"
-        style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+        style={{ height: `calc(100vh - ${heightLanding}px)` }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onMouseDown={handleTouchStart}

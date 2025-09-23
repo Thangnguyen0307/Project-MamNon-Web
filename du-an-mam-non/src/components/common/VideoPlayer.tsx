@@ -6,6 +6,7 @@ interface VideoPlayerProps {
   autoPlay?: boolean;
   controls?: boolean;
   className?: string;
+  poster?: string;
 }
 
 export default function VideoPlayer({
@@ -13,6 +14,7 @@ export default function VideoPlayer({
   autoPlay = false,
   controls = true,
   className = "",
+  poster,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -33,6 +35,7 @@ export default function VideoPlayer({
       controls={controls}
       autoPlay={autoPlay}
       className={className}
+      poster={poster}
     />
   );
 }

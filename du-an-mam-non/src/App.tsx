@@ -19,8 +19,6 @@ import GV_AddBlog from "./pages/GiaoVien/GV_AddBlog";
 import GV_EditBlog from "./pages/GiaoVien/GV_EditBlog";
 
 import Homepage2 from "./pages/HomePage2/Homepage2";
-
-import UserProfiles from "./pages/UserProfiles";
 import ResetPassword from "./pages/AuthPages/ResetPassword";
 import CreateNewPassword from "./pages/AuthPages/CreateNewPassword";
 
@@ -38,7 +36,6 @@ export default function App() {
               <Route path="gvuquanlynguoidung" element={<UserManagement />} />
               <Route path="gvuquanlylophoc" element={<ClassManagement />} />
               <Route path="gvuquanlykhoilop" element={<GradeManagement />} />
-              <Route path="profile" element={<UserProfiles />} />
             </Route>
           </Route>
           <Route element={<ProtectedRoute allowedRoles={["TEACHER"]} />}>
@@ -50,7 +47,6 @@ export default function App() {
                 path="chinhsuabaiviet/:classId/:blogId"
                 element={<GV_EditBlog />}
               />
-              <Route path="profile" element={<UserProfiles />} />
             </Route>
           </Route>
           {/* HomePage   */}

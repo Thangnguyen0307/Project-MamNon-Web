@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
 import TextArea from "../../components/form/input/TextArea";
@@ -30,6 +30,7 @@ interface VideoUpload {
 const GV_AddBlog = () => {
   const { classId } = useParams();
   const CHUNK_SIZE = 5 * 1024 * 1024;
+  const navigate = useNavigate();
   const [mount, setMount] = useState(false);
   const [uploadPercent, setUploadPercent] = useState<Record<string, number>>(
     {}
@@ -199,6 +200,7 @@ const GV_AddBlog = () => {
       toast.error(err.response?.data?.message || "Lỗi khi tạo bài viết");
     } finally {
       setMount(false);
+      navigate(`/giaovien/baiviet/${classId}`);
     }
   };
 
