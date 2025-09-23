@@ -6,10 +6,11 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
-import { DeleteUserIcon, EditUserIcon } from "../../icons";
+
 import Pagination from "../../components/common/Pagination";
 import Badge from "../../components/ui/badge/Badge";
 import Tooltip from "../../components/common/Tooltip";
+import { UserRoundCog, UserRoundPen } from "lucide-react";
 
 export interface UserData {
   id: string;
@@ -103,14 +104,22 @@ export const UserManagementTable: React.FC<TableProps> = ({
                         <span
                           className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
                           onClick={() => modalUpdate(item.id, "changeRole")}>
-                          <EditUserIcon />
+                          <UserRoundPen
+                            size={22}
+                            absoluteStrokeWidth
+                            color={"#696969"}
+                          />
                         </span>
                       </Tooltip>
                       <Tooltip text="Trạng thái">
                         <span
                           className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
                           onClick={() => modalUpdate(item.id, "changeStatus")}>
-                          <DeleteUserIcon />
+                          <UserRoundCog
+                            size={22}
+                            absoluteStrokeWidth
+                            color={"#FF6633"}
+                          />
                         </span>
                       </Tooltip>
                     </div>

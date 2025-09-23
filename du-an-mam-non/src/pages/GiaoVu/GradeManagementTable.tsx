@@ -6,11 +6,11 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import dayjs from "dayjs";
-import { DeleteUserIcon, EditUserIcon } from "../../icons";
 import Pagination from "../../components/common/Pagination";
 import ConfirmDeleteModal from "../../components/common/ConfirmDeleteModal";
 import { useState } from "react";
 import Tooltip from "../../components/common/Tooltip";
+import { Trash, UserRoundPen } from "lucide-react";
 
 export interface LevelsData {
   id: string;
@@ -104,14 +104,22 @@ export const GradeManagementTable: React.FC<TableProps> = ({
                         <span
                           className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
                           onClick={() => modalUpdate(item.id)}>
-                          <EditUserIcon />
+                          <UserRoundPen
+                            size={22}
+                            absoluteStrokeWidth
+                            color={"#696969"}
+                          />
                         </span>
                       </Tooltip>
                       <Tooltip text="Xoá">
                         <span
                           className="text-lg hover:cursor-pointer hover:scale-120 transition-all duration-200 ease-in-out"
                           onClick={() => handleOpenDelete(item.id)}>
-                          <DeleteUserIcon />
+                          <Trash
+                            size={22}
+                            absoluteStrokeWidth
+                            color={"#dc3545"}
+                          />
                         </span>
                       </Tooltip>
                     </div>

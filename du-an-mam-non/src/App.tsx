@@ -19,6 +19,7 @@ import GV_AddBlog from "./pages/GiaoVien/GV_AddBlog";
 import GV_EditBlog from "./pages/GiaoVien/GV_EditBlog";
 
 import Homepage2 from "./pages/HomePage2/Homepage2";
+import TeachersPage from "./pages/TeacherPage/TeachersPage";
 
 import UserProfiles from "./pages/UserProfiles";
 import ResetPassword from "./pages/AuthPages/ResetPassword";
@@ -58,6 +59,7 @@ export default function App() {
           {/* Auth Layout */}
           <Route element={<PublicRoute />}>
             <Route path="/" element={<Homepage2 />} />
+            <Route path="/doi-ngu-giao-vien" element={<TeachersPage />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/resetpassword" element={<ResetPassword />} />
             <Route path="/createnewpassword" element={<CreateNewPassword />} />
@@ -70,7 +72,8 @@ export default function App() {
         position="bottom-right"
         toastOptions={{
           className: "",
-          style: { fontSize: "14px" },
+          duration: 5000,
+          style: { fontSize: "16px" },
         }}
       />
     </>

@@ -30,6 +30,10 @@ interface VideoUpload {
 const GV_AddBlog = () => {
   const { classId } = useParams();
   const CHUNK_SIZE = 5 * 1024 * 1024;
+  const [mount, setMount] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState<Record<string, number>>(
+    {}
+  );
   const [blogData, setBlogData] = useState<Blog>({
     title: "",
     content: "",
@@ -121,24 +125,30 @@ const GV_AddBlog = () => {
   };
 
   const createBlogFormData = async () => {
+    if (mount) return;
+    setMount(true);
     try {
       const uploadedInitIds: string[] = [];
       for (const video of blogData.videos) {
         try {
-          console.log(`🚀 Upload video: ${video.name}`);
-
           const initId = await createInit();
           uploadedInitIds.push(initId);
           console.log(initId);
 
           for (let i = 0; i < video.chunks.length; i++) {
             await uploadChunk(initId, video.chunks[i], i, video.chunks.length);
-            console.log(`✅ Uploaded chunk ${i + 1}/${video.chunks.length}`);
+            const percent = Math.floor(((i + 1) / video.chunks.length) * 100);
+            setUploadPercent((prev) => ({
+              ...prev,
+              [initId]: percent,
+            }));
           }
-
-          console.log(`🎉 Hoàn tất video: ${video.name}`);
         } catch (err) {
           console.error(`❌ Lỗi upload video: ${video.name}`, err);
+          const error = err as AxiosError<{ message: string }>;
+          if (error.response && error.response.data.message) {
+            toast.error(error.response.data.message);
+          }
         }
       }
 
@@ -167,11 +177,28 @@ const GV_AddBlog = () => {
       );
 
       if (response.data) {
-        toast.success("Tạo bài viết thành công  ");
+        toast.custom(
+          (t) => (
+            <div className="relative flex items-start w-80 max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+              <div className="flex-shrink-0 text-2xl mr-3">✅</div>
+              <div className="flex-1">
+                <p className="text-sm text-gray-600">Tạo bài viết thành công</p>
+              </div>
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+                ✖
+              </button>
+            </div>
+          ),
+          { duration: Infinity }
+        );
       }
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       toast.error(err.response?.data?.message || "Lỗi khi tạo bài viết");
+    } finally {
+      setMount(false);
     }
   };
 
@@ -272,10 +299,33 @@ const GV_AddBlog = () => {
                   ))}
                 </div>
               </div>
+
+              {Object.keys(uploadPercent).length > 0 && (
+                <div>
+                  {Object.entries(uploadPercent).map(
+                    ([videoId, percent], index) => (
+                      <div key={videoId} className="mb-2">
+                        <div className="text-sm mb-1">Video: {index + 1}</div>
+                        <div className="w-full bg-gray-200 rounded">
+                          <div
+                            className="bg-green-500 text-xs leading-none py-1 text-center text-white rounded"
+                            style={{ width: `${percent}%` }}>
+                            {percent}%
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
             </ComponentCard>
           </div>
           <div className="flex items-center gap-3">
-            <Button size="sm" variant="orange" onClick={createBlogFormData}>
+            <Button
+              size="sm"
+              variant="orange"
+              onClick={createBlogFormData}
+              disabled={mount}>
               Tạo bài viết
             </Button>
             <Link to={"/giaovien"}>

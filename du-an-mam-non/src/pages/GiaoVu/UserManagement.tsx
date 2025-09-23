@@ -14,7 +14,7 @@ import { axiosInstance } from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
-import { toBoolean } from "../../utils/helper";
+import { isNonEmptyString, toBoolean, validateEmail } from "../../utils/helper";
 
 const UserManagement = () => {
   const { isOpen, openModal, closeModal } = useModal();
@@ -22,6 +22,7 @@ const UserManagement = () => {
   const [selectedType, setSelectedType] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState([]);
+  const [error, setError] = useState("");
   const optionsRole = [
     { value: "ADMIN", label: "Admin" },
     { value: "TEACHER", label: "Teacher" },
@@ -74,12 +75,14 @@ const UserManagement = () => {
   };
 
   const modalCreate = () => {
+    setError("");
     setSelectedItem(null);
     setUsersParam(defaultUsersParam);
     openModal();
   };
 
   const modalUpdate = (id: string, type: string) => {
+    setError("");
     setSelectedItem(id);
     if (type === "changeStatus") {
       setSelectedType(type);
@@ -120,8 +123,6 @@ const UserManagement = () => {
   const changeRoleUser = async (id: string) => {
     if (loading) return;
     setLoading(true);
-    console.log(usersParam.role);
-
     try {
       const response = await axiosInstance.put(
         API_PATHS.ADMIN.CHANGE_ROLE(id),
@@ -130,6 +131,8 @@ const UserManagement = () => {
         }
       );
       if (response.data) {
+        closeModal();
+        setError("");
         toast.success("Đổi role tài khoản thành công");
         fetchAllUsers();
       }
@@ -145,6 +148,7 @@ const UserManagement = () => {
 
   const changeStatusUser = async (id: string) => {
     if (loading) return;
+    setLoading(true);
     try {
       const response = await axiosInstance.put(
         API_PATHS.ADMIN.CHANGE_STATUS(id),
@@ -154,6 +158,8 @@ const UserManagement = () => {
       );
 
       if (response.data) {
+        closeModal();
+        setError("");
         toast.success("Đổi status tài khoản thành công");
         fetchAllUsers();
       }
@@ -169,9 +175,18 @@ const UserManagement = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    closeModal();
+
     try {
       if (!selectedItem) {
+        if (!validateEmail(usersParam.email)) {
+          setError("Vui lòng nhập gmail đúng định dạng abc@xyz.com");
+          return;
+        }
+
+        if (!isNonEmptyString(usersParam.role)) {
+          setError("Vui lòng chọn role cho người dùng");
+          return;
+        }
         const response = await axiosInstance.post(
           API_PATHS.ADMIN.CREATE_ACCOUNT,
           {
@@ -180,6 +195,8 @@ const UserManagement = () => {
           }
         );
         if (response.data) {
+          closeModal();
+          setError("");
           toast.success("Tạo tài khoản người dùng thành công");
           fetchAllUsers();
         }
@@ -293,13 +310,16 @@ const UserManagement = () => {
                             onChange={(name, value) =>
                               handleValueChange(name, value)
                             }
-                            className="dark:bg-dark-900  "
+                            className="dark:bg-dark-900"
                           />
                         </div>
                       )}
                     </>
                   )}
                 </div>
+                {error && (
+                  <p className="text-red-500 text-sm pb-2.5 mt-2">{error}</p>
+                )}
               </div>
               <div className="flex items-center gap-3 px-2 mt-6 justify-end">
                 <Button
