@@ -70,7 +70,8 @@ export default function App() {
         position="bottom-right"
         toastOptions={{
           className: "",
-          style: { fontSize: "14px" },
+          duration: 5000,
+          style: { fontSize: "16px" },
         }}
       />
     </>

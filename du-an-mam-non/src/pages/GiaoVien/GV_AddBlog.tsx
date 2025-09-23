@@ -128,8 +128,6 @@ const GV_AddBlog = () => {
       const uploadedInitIds: string[] = [];
       for (const video of blogData.videos) {
         try {
-          console.log(`🚀 Upload video: ${video.name}`);
-
           const initId = await createInit();
           uploadedInitIds.push(initId);
           console.log(initId);
@@ -141,13 +139,13 @@ const GV_AddBlog = () => {
               ...prev,
               [initId]: percent,
             }));
-
-            console.log(`✅ Uploaded chunk ${i + 1}/${video.chunks.length}`);
           }
-
-          console.log(`🎉 Hoàn tất video: ${video.name}`);
         } catch (err) {
           console.error(`❌ Lỗi upload video: ${video.name}`, err);
+          const error = err as AxiosError<{ message: string }>;
+          if (error.response && error.response.data.message) {
+            toast.error(error.response.data.message);
+          }
         }
       }
 
@@ -176,7 +174,7 @@ const GV_AddBlog = () => {
       );
 
       if (response.data) {
-        toast.success("Tạo bài viết thành công  ");
+        toast.success("Tạo bài viết thành công", { duration: Infinity });
       }
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;

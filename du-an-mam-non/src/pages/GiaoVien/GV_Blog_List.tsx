@@ -103,8 +103,6 @@ const GV_Blog_List: React.FC = () => {
     }));
   };
 
-  console.log(currentSlides);
-
   const buildAllMedia = (
     images: string[] | null,
     videos: VideoInfo[] | null
