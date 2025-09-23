@@ -10,10 +10,24 @@ import { API_PATHS } from "../../utils/apiPaths";
 import { AxiosError } from "axios";
 import Button from "../../components/ui/button/Button";
 import toast from "react-hot-toast";
+import VideoPlayer from "../../components/common/VideoPlayer";
+
+interface VideoUpload {
+  name: string;
+  file: File;
+  url: string;
+  chunks: Blob[];
+  initId?: string;
+}
+interface VideosData {
+  _id: string;
+  m3u8: string;
+  thumbnail: string;
+}
 
 interface BlogParams {
   images: File[];
-  existingImages: string[];
+  videos: VideoUpload[];
 }
 
 interface BlogData {
@@ -21,20 +35,29 @@ interface BlogData {
   content: string;
   class: string;
   images: string[];
+  videos: VideosData[];
+  videosRemove: VideosData[];
 }
 
 const GV_EditBlog = () => {
   const { classId, blogId } = useParams();
+  const CHUNK_SIZE = 5 * 1024 * 1024;
+  const [uploadPercent, setUploadPercent] = useState<Record<string, number>>(
+    {}
+  );
   const [blogData, setBlogData] = useState<BlogData>({
     title: "",
     content: "",
     class: "",
     images: [],
+    videos: [],
+    videosRemove: [],
   });
   const [blogParams, setBlogParams] = useState<BlogParams>({
     images: [],
-    existingImages: [],
+    videos: [],
   });
+
   console.log(blogData);
 
   useEffect(() => {
@@ -61,6 +84,45 @@ const GV_EditBlog = () => {
       }));
     }
   };
+
+  const handleVideoChange = async (files: FileList | null) => {
+    if (!files) return;
+
+    const selectedVideos = Array.from(files)
+      .filter((file) => file.type === "video/mp4")
+      .map((file) => {
+        const chunks: Blob[] = [];
+        for (let start = 0; start < file.size; start += CHUNK_SIZE) {
+          const end = Math.min(start + CHUNK_SIZE, file.size);
+          chunks.push(file.slice(start, end));
+        }
+
+        return {
+          name: file.name,
+          file: file,
+          url: URL.createObjectURL(file),
+          chunks: chunks,
+          initId: "",
+        };
+      });
+
+    setBlogParams((prev) => ({
+      ...prev,
+      videos: [...prev.videos, ...selectedVideos],
+    }));
+  };
+
+  const handleRemoveVideo = (index: number) => {
+    setBlogParams((prev) => {
+      URL.revokeObjectURL(prev.videos[index].url);
+
+      return {
+        ...prev,
+        videos: prev.videos.filter((_, i) => i !== index),
+      };
+    });
+  };
+
   console.log(blogParams);
 
   const getDetailBlog = async () => {
@@ -80,8 +142,59 @@ const GV_EditBlog = () => {
     }
   };
 
+  const createInit = async () => {
+    const response = await axiosInstance.post(API_PATHS.VIDEO.INIT_VIDEO, {});
+    return response.data.data._id;
+  };
+
+  const uploadChunk = async (
+    initId: string,
+    chunk: Blob,
+    chunkIndex: number,
+    totalChunks: number
+  ) => {
+    const formData = new FormData();
+    formData.append("chunkIndex", chunkIndex.toString());
+    formData.append("totalChunks", totalChunks.toString());
+    formData.append("file", chunk);
+
+    await axiosInstance.post(
+      `${API_PATHS.VIDEO.UPLOAD_CHUNK(initId)}`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+  };
+
   const editBlogFormData = async () => {
     try {
+      const uploadedInitIds: string[] = [];
+      for (const video of blogParams.videos) {
+        try {
+          console.log(`🚀 Upload video: ${video.name}`);
+
+          const initId = await createInit();
+          uploadedInitIds.push(initId);
+          console.log(initId);
+
+          for (let i = 0; i < video.chunks.length; i++) {
+            await uploadChunk(initId, video.chunks[i], i, video.chunks.length);
+            const percent = Math.floor(((i + 1) / video.chunks.length) * 100);
+            setUploadPercent((prev) => ({
+              ...prev,
+              [initId]: percent,
+            }));
+
+            console.log(`✅ Uploaded chunk ${i + 1}/${video.chunks.length}`);
+          }
+
+          console.log(`🎉 Hoàn tất video: ${video.name}`);
+        } catch (err) {
+          console.error(`❌ Lỗi upload video: ${video.name}`, err);
+        }
+      }
+
       const formData = new FormData();
       formData.append("title", blogData.title);
       formData.append("content", blogData.content);
@@ -96,6 +209,16 @@ const GV_EditBlog = () => {
       if (blogParams.images && blogParams.images.length > 0) {
         blogParams.images.forEach((url) => {
           formData.append("images", url);
+        });
+      }
+
+      uploadedInitIds.forEach((id) => {
+        formData.append("addVideoIds", id);
+      });
+
+      if (blogData.videosRemove && blogData.videosRemove.length > 0) {
+        blogData.videosRemove.forEach((video) => {
+          formData.append("removeVideoIds", video._id);
         });
       }
       console.log(formData);
@@ -148,7 +271,7 @@ const GV_EditBlog = () => {
               }}
             />
           </div>
-          <ComponentCard title="Danh sách hình ảnh giữ lại">
+          <ComponentCard title="Danh sách hình ảnh hiện tại">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {blogData.images.map((file, index) => (
                 <div
@@ -176,6 +299,78 @@ const GV_EditBlog = () => {
                   </button>
                 </div>
               ))}
+            </div>
+          </ComponentCard>
+          <ComponentCard title="Danh sách video hiện tại">
+            <div>
+              <Label>Chọn file video (mp4)</Label>
+
+              <div className="grid grid-cols-2 gap-4 mt-5">
+                {blogData.videos.map((video, index) => (
+                  <div key={index} className="relative">
+                    <VideoPlayer
+                      src={`https://techleaf.pro/projects/mam-non-media${video.m3u8}`}
+                      controls
+                      className="w-full h-40 object-cover rounded-lg shadow"
+                    />
+                    <button
+                      onClick={() =>
+                        setBlogData((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                videos: prev.videos.filter(
+                                  (_, i) => i !== index
+                                ),
+                                videosRemove: [
+                                  ...(prev.videosRemove ?? []),
+                                  prev.videos[index],
+                                ],
+                              }
+                            : prev
+                        )
+                      }
+                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                      Xóa
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ComponentCard>
+          <ComponentCard title="Danh sách video muốn gỡ bỏ">
+            <div>
+              <div className="grid grid-cols-2 gap-4 mt-5">
+                {blogData.videosRemove?.map((video, index) => (
+                  <div key={index} className="relative">
+                    <VideoPlayer
+                      src={`https://techleaf.pro/projects/mam-non-media${video.m3u8}`}
+                      controls
+                      className="w-full h-40 object-cover rounded-lg shadow"
+                    />
+                    <button
+                      onClick={() =>
+                        setBlogData((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                videosRemove: prev.videosRemove.filter(
+                                  (_, i) => i !== index
+                                ),
+                                videos: [
+                                  ...prev.videos,
+                                  prev.videosRemove[index],
+                                ],
+                              }
+                            : prev
+                        )
+                      }
+                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                      Hoàn tác
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </ComponentCard>
 
@@ -217,6 +412,52 @@ const GV_EditBlog = () => {
                 </div>
               ))}
             </div>
+          </ComponentCard>
+          <ComponentCard title="Video">
+            <div>
+              <Label>Chọn file video (mp4)</Label>
+              <FileInput
+                onFilesSelected={handleVideoChange}
+                accept="video/mp4"
+                className="custom-class"
+                multiple
+              />
+              <div className="grid grid-cols-2 gap-4 mt-5">
+                {blogParams.videos.map((video, index) => (
+                  <div key={index} className="relative">
+                    <video
+                      src={video.url}
+                      controls
+                      className="w-full h-40 object-cover rounded-lg shadow"
+                    />
+                    <button
+                      onClick={() => handleRemoveVideo(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                      Xóa
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {Object.keys(uploadPercent).length > 0 && (
+              <div>
+                {Object.entries(uploadPercent).map(
+                  ([videoId, percent], index) => (
+                    <div key={videoId} className="mb-2">
+                      <div className="text-sm mb-1">Video: {index + 1}</div>
+                      <div className="w-full bg-gray-200 rounded">
+                        <div
+                          className="bg-green-500 text-xs leading-none py-1 text-center text-white rounded"
+                          style={{ width: `${percent}%` }}>
+                          {percent}%
+                        </div>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
           </ComponentCard>
         </div>
         <div className="flex items-center gap-3 mt-3">

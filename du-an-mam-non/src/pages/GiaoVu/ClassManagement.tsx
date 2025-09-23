@@ -19,12 +19,14 @@ import Select from "../../components/form/Select";
 import { LevelsData } from "./GradeManagementTable";
 import { UserData } from "./UserManagementTable";
 import MultiSelect from "../../components/form/MultiSelect";
+import { validateYearRange } from "../../utils/helper";
 
 const ClassManagement: React.FC = () => {
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedItem, setSelectedItem] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [classesData, setClassesData] = useState([]);
+  const [error, setError] = useState("");
   const [optionsProp, setOptionsProp] = useState({
     optionsLevels: [],
     optionsTeachers: [],
@@ -98,11 +100,13 @@ const ClassManagement: React.FC = () => {
   };
 
   const modalCreate = () => {
+    setError("");
     setSelectedItem(null);
     setClassesParam(defaultClassesParam);
     openModal();
   };
   const modalUpdate = (id: string) => {
+    setError("");
     setSelectedItem(id);
     fetchDetailClasses(id);
     openModal();
@@ -200,7 +204,11 @@ const ClassManagement: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    closeModal();
+
+    if (!validateYearRange(classesParam.schoolYear)) {
+      setError("Năm bắt đầu phải nhỏ hơn năm kết thúc");
+      return;
+    }
     try {
       if (!selectedItem) {
         const response = await axiosInstance.post(
@@ -213,6 +221,7 @@ const ClassManagement: React.FC = () => {
           }
         );
         if (response) {
+          closeModal();
           toast.success("Tạo lớp học thành công");
           fetchAllClasses();
         }
@@ -227,6 +236,7 @@ const ClassManagement: React.FC = () => {
           }
         );
         if (response) {
+          closeModal();
           toast.success("Cập nhật lớp học thành công");
           fetchAllClasses();
         }
@@ -343,6 +353,11 @@ const ClassManagement: React.FC = () => {
                         }}
                         required
                       />
+                      {error && (
+                        <p className="text-red-500 text-center text-sm pb-2.5 mt-2">
+                          {error}
+                        </p>
+                      )}
                     </div>
                     {selectedItem && (
                       <>

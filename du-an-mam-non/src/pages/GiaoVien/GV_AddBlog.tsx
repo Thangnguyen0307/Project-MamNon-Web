@@ -30,6 +30,9 @@ interface VideoUpload {
 const GV_AddBlog = () => {
   const { classId } = useParams();
   const CHUNK_SIZE = 5 * 1024 * 1024;
+  const [uploadPercent, setUploadPercent] = useState<Record<string, number>>(
+    {}
+  );
   const [blogData, setBlogData] = useState<Blog>({
     title: "",
     content: "",
@@ -133,6 +136,12 @@ const GV_AddBlog = () => {
 
           for (let i = 0; i < video.chunks.length; i++) {
             await uploadChunk(initId, video.chunks[i], i, video.chunks.length);
+            const percent = Math.floor(((i + 1) / video.chunks.length) * 100);
+            setUploadPercent((prev) => ({
+              ...prev,
+              [initId]: percent,
+            }));
+
             console.log(`✅ Uploaded chunk ${i + 1}/${video.chunks.length}`);
           }
 
@@ -272,6 +281,25 @@ const GV_AddBlog = () => {
                   ))}
                 </div>
               </div>
+
+              {Object.keys(uploadPercent).length > 0 && (
+                <div>
+                  {Object.entries(uploadPercent).map(
+                    ([videoId, percent], index) => (
+                      <div key={videoId} className="mb-2">
+                        <div className="text-sm mb-1">Video: {index + 1}</div>
+                        <div className="w-full bg-gray-200 rounded">
+                          <div
+                            className="bg-green-500 text-xs leading-none py-1 text-center text-white rounded"
+                            style={{ width: `${percent}%` }}>
+                            {percent}%
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
             </ComponentCard>
           </div>
           <div className="flex items-center gap-3">

@@ -2,9 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 
 // Assume these icons are imported from an icon library
-import { ChevronDownIcon, HorizontaLDots, UserIcon } from "../icons";
+import { ChevronDownIcon, HorizontaLDots } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
+import { School2Icon, SchoolIcon, UsersRound } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -15,19 +16,19 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    icon: <UserIcon />,
-    name: "Quản lý lớp học",
-    path: "gvuquanlylophoc",
-  },
-  {
-    icon: <UserIcon />,
+    icon: <UsersRound />,
     name: "Quản lý người dùng",
     path: "gvuquanlynguoidung",
   },
   {
-    icon: <UserIcon />,
+    icon: <SchoolIcon />,
     name: "Quản lý khối lớp học",
     path: "gvuquanlykhoilop",
+  },
+  {
+    icon: <School2Icon />,
+    name: "Quản lý lớp học",
+    path: "gvuquanlylophoc",
   },
 ];
 

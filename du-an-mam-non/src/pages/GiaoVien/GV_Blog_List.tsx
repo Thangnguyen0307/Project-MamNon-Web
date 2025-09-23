@@ -7,7 +7,6 @@ import { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { Link, useParams } from "react-router";
-import Button from "../../components/ui/button/Button";
 import VideoPlayer from "../../components/common/VideoPlayer";
 
 interface VideoSlide {
@@ -59,6 +58,7 @@ const GV_Blog_List: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [blogsData, setBlogsData] = useState<BlogsData[]>([]);
   const [currentSlides, setCurrentSlides] = useState<CustomSlide[]>([]);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -177,12 +177,12 @@ const GV_Blog_List: React.FC = () => {
       {/* Header */}
       {blogsData?.length > 0 ? (
         blogsData.map((blog: BlogsData) => (
-          <div className="pt-10 px-2">
+          <div className="pt-4 px-2">
             <div className="w-full max-w-3xl mx-auto bg-white shadow rounded-xl p-3 sm:p-4 border border-gray-200 ">
               <div className="flex items-center justify-between space-x-3 mb-3">
                 <div className="min-w-0">
                   <p className="font-semibold text-sm sm:text-base truncate">
-                    {blog.author.fullName}
+                    {blog.author?.fullName}
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500">
                     {blog.class.name} - {blog.class.level.name}
@@ -191,18 +191,38 @@ const GV_Blog_List: React.FC = () => {
                     {dayjs(blog.createdAt).format("DD-MM-YYYY hh:mm")}
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  <Link to={`/giaovien/chinhsuabaiviet/${classId}/${blog._id}`}>
-                    <Button size="sm" variant="orange">
-                      Chỉnh sửa
-                    </Button>
-                  </Link>
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    onClick={() => deleteBlogs(blog._id)}>
-                    Xoá
-                  </Button>
+                <div className="relative inline-block text-left">
+                  <button
+                    onClick={() =>
+                      setOpenMenuId((prev) =>
+                        prev === blog._id ? null : blog._id
+                      )
+                    }
+                    className="p-2 rounded-full hover:bg-gray-100 focus:outline-none">
+                    <svg
+                      className="w-5 h-5 text-gray-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20">
+                      <path d="M6 10a2 2 0 114 0 2 2 0 01-4 0zm6 0a2 2 0 114 0 2 2 0 01-4 0z" />
+                    </svg>
+                  </button>
+
+                  {openMenuId === blog._id && (
+                    <div className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md  bg-white shadow-lg ring-1 ring-[#F6F1E4] ring-opacity-5">
+                      <div className="py-1">
+                        <Link
+                          to={`/giaovien/chinhsuabaiviet/${classId}/${blog._id}`}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                          ✏️ Chỉnh sửa
+                        </Link>
+                        <button
+                          onClick={() => deleteBlogs(blog._id)}
+                          className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700">
+                          🗑️ Xoá
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
