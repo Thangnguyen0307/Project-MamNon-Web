@@ -30,6 +30,7 @@ interface VideoUpload {
 const GV_AddBlog = () => {
   const { classId } = useParams();
   const CHUNK_SIZE = 5 * 1024 * 1024;
+  const [mount, setMount] = useState(false);
   const [uploadPercent, setUploadPercent] = useState<Record<string, number>>(
     {}
   );
@@ -124,6 +125,8 @@ const GV_AddBlog = () => {
   };
 
   const createBlogFormData = async () => {
+    if (mount) return;
+    setMount(true);
     try {
       const uploadedInitIds: string[] = [];
       for (const video of blogData.videos) {
@@ -174,11 +177,28 @@ const GV_AddBlog = () => {
       );
 
       if (response.data) {
-        toast.success("Tạo bài viết thành công", { duration: Infinity });
+        toast.custom(
+          (t) => (
+            <div className="relative flex items-start w-80 max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+              <div className="flex-shrink-0 text-2xl mr-3">✅</div>
+              <div className="flex-1">
+                <p className="text-sm text-gray-600">Tạo bài viết thành công</p>
+              </div>
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+                ✖
+              </button>
+            </div>
+          ),
+          { duration: Infinity }
+        );
       }
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       toast.error(err.response?.data?.message || "Lỗi khi tạo bài viết");
+    } finally {
+      setMount(false);
     }
   };
 
@@ -301,7 +321,11 @@ const GV_AddBlog = () => {
             </ComponentCard>
           </div>
           <div className="flex items-center gap-3">
-            <Button size="sm" variant="orange" onClick={createBlogFormData}>
+            <Button
+              size="sm"
+              variant="orange"
+              onClick={createBlogFormData}
+              disabled={mount}>
               Tạo bài viết
             </Button>
             <Link to={"/giaovien"}>

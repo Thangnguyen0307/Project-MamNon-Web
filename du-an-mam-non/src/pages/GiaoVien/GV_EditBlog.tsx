@@ -42,6 +42,7 @@ interface BlogData {
 const GV_EditBlog = () => {
   const { classId, blogId } = useParams();
   const CHUNK_SIZE = 5 * 1024 * 1024;
+  const [mount, setMount] = useState(false);
   const [uploadPercent, setUploadPercent] = useState<Record<string, number>>(
     {}
   );
@@ -168,6 +169,10 @@ const GV_EditBlog = () => {
   };
 
   const editBlogFormData = async () => {
+    if (mount) {
+      return;
+    }
+    setMount(true);
     try {
       const uploadedInitIds: string[] = [];
       for (const video of blogParams.videos) {
@@ -221,7 +226,6 @@ const GV_EditBlog = () => {
           formData.append("removeVideoIds", video._id);
         });
       }
-      console.log(formData);
 
       const response = await axiosInstance.put(
         API_PATHS.BLOG.UPDATE_BLOG(blogId as string),
@@ -234,11 +238,28 @@ const GV_EditBlog = () => {
       );
 
       if (response.data) {
-        toast.success("Cập nhật bài viết thành công  ");
+        toast.custom(
+          (t) => (
+            <div className="relative flex  w-80 max-w-sm bg-white border border-gray-200 rounded-lg items-center shadow-lg p-4">
+              <div className="flex-shrink-0 text-2xl mr-3">✅</div>
+              <div className="">
+                <p className="text-sm text-gray-600">Tạo bài viết thành công</p>
+              </div>
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+                ✖
+              </button>
+            </div>
+          ),
+          { duration: Infinity }
+        );
       }
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       toast.error(err.response?.data?.message || "Lỗi khi cập nhật bài viết");
+    } finally {
+      setMount(false);
     }
   };
 
@@ -461,7 +482,11 @@ const GV_EditBlog = () => {
           </ComponentCard>
         </div>
         <div className="flex items-center gap-3 mt-3">
-          <Button variant="orange" size="sm" onClick={editBlogFormData}>
+          <Button
+            variant="orange"
+            size="sm"
+            onClick={editBlogFormData}
+            disabled={mount}>
             Cập nhật bài viết
           </Button>
           <Link to={"/giaovien"}>
