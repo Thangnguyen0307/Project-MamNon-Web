@@ -8,6 +8,7 @@ import { validateEmail } from "../../utils/helper";
 import { API_PATHS } from "../../utils/apiPaths";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { useUser } from "../../context/UserContext";
+import { AxiosError } from "axios";
 
 export default function SignInForm() {
   const [email, setEmail] = useState("");
@@ -15,8 +16,7 @@ export default function SignInForm() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { updateUser } = useUser();
-  // const navigate = useNavigate();
-  // Call API LOGIN
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -45,8 +45,11 @@ export default function SignInForm() {
         localStorage.setItem("refreshToken", refreshToken);
         updateUser(user);
       }
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      if (error.response && error.response.data.message) {
+        setError(error.response.data.message);
+      }
     }
   };
 
@@ -61,7 +64,7 @@ export default function SignInForm() {
         </Link>
       </div>
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto ">
-        <div className="border border-gray-200 rounded-2xl shadow-2xl p-5">
+        <div className="border border-gray-200 rounded-2xl shadow-2xl p-5 bg-white">
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
               Đăng nhập
@@ -70,10 +73,10 @@ export default function SignInForm() {
               Nhập mật khẩu và tài khoản đã được cấp
             </p>
           </div>
-          <div>
+          <div className="">
             <form onSubmit={handleLogin}>
               <div className="space-y-6">
-                <div>
+                <div className="mb-3">
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}
                   </Label>
@@ -83,7 +86,7 @@ export default function SignInForm() {
                     onChange={({ target }) => setEmail(target.value)}
                   />
                 </div>
-                <div>
+                <div className="mb-2">
                   <Label>
                     Mật khẩu <span className="text-error-500">*</span>{" "}
                   </Label>
@@ -105,9 +108,7 @@ export default function SignInForm() {
                     </span>
                   </div>
                 </div>
-                {error && (
-                  <p className="text-red-500 text-xs pb-2.5">{error}</p>
-                )}
+                {error && <p className="text-red-500 text-xs mb-2">{error}</p>}
                 <div className="flex items-center justify-between">
                   <Link
                     to="/resetpassword"

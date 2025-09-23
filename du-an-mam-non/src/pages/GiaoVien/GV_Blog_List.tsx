@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Lightbox from "yet-another-react-lightbox";
+import Lightbox, { SlideImage } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
@@ -7,7 +7,14 @@ import { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { Link, useParams } from "react-router";
-import Button from "../../components/ui/button/Button";
+import VideoPlayer from "../../components/common/VideoPlayer";
+import { motion } from "framer-motion";
+
+interface VideoSlide {
+  type: "video";
+  src: string;
+}
+type CustomSlide = SlideImage | VideoSlide;
 
 export interface Author {
   id: string;
@@ -26,11 +33,18 @@ interface ClassInfo {
   level: Level;
 }
 
+interface VideoInfo {
+  _id: string;
+  m3u8: string;
+  thumbnail: string;
+}
+
 export interface BlogsData {
   _id: string;
   title: string;
   content: string;
   images: string[];
+  videos: VideoInfo[];
   author: Author;
   class: ClassInfo;
   createdAt: string;
@@ -44,7 +58,8 @@ const GV_Blog_List: React.FC = () => {
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [blogsData, setBlogsData] = useState<BlogsData[]>([]);
-  const [currentSlides, setCurrentSlides] = useState<{ src: string }[]>([]);
+  const [currentSlides, setCurrentSlides] = useState<CustomSlide[]>([]);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -81,48 +96,63 @@ const GV_Blog_List: React.FC = () => {
     return blogs.map((blog) => ({
       ...blog,
       images: blog.images?.map((img) => `${BASE_MEDIA_URL}${img}`) || [],
+      videos:
+        blog.videos?.map((video) => ({
+          ...video,
+          m3u8: `${BASE_MEDIA_URL}${video.m3u8}`,
+        })) || [],
     }));
   };
 
-  const renderPhoto = (images: string[]) => {
-    if (images.length === 0) return null;
+  const buildAllMedia = (
+    images: string[] | null,
+    videos: VideoInfo[] | null
+  ) => {
+    return [
+      ...(images || []).map((u) => ({ src: u, type: "image" as const })),
+      ...(videos || []).map((v) => ({
+        src: v.m3u8,
+        type: "video" as const,
+      })),
+    ];
+  };
 
-    if (images.length === 1) {
-      return (
-        <div
-          className="cursor-pointer"
-          onClick={() => {
-            setCurrentSlides(images.map((src) => ({ src })));
-            setIndex(0);
-            setOpen(true);
-          }}>
-          <img
-            src={images[0]}
-            alt="Photo 0"
-            className="w-full aspect-video object-cover rounded-lg"
-          />
-        </div>
-      );
-    }
+  const renderMedia = (images: string[] | null, videos: VideoInfo[] | null) => {
+    const allMedia = buildAllMedia(images, videos);
 
-    const extraCount = images.length - 1;
-
+    if (allMedia.length === 0) return null;
+    const totalExtra = allMedia.length - 1;
     return (
       <div
         className="relative cursor-pointer"
         onClick={() => {
-          setCurrentSlides(images.map((src) => ({ src })));
+          const slides = allMedia.map((m) => ({
+            src: m.src,
+            type: m.type,
+          }));
+          setCurrentSlides(slides as unknown as CustomSlide[]);
           setIndex(0);
           setOpen(true);
         }}>
-        <img
-          src={images[0]}
-          alt="Photo 0"
-          className="w-full aspect-video object-cover rounded-lg opacity-50"
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-white text-3xl font-bold">+{extraCount}</span>
-        </div>
+        {allMedia[0].type === "video" ? (
+          <VideoPlayer
+            src={allMedia[0].src}
+            className="w-full aspect-video object-cover rounded-lg"
+            controls
+          />
+        ) : (
+          <img
+            src={allMedia[0].src}
+            alt="media preview"
+            className="w-full aspect-video object-cover rounded-lg"
+          />
+        )}
+
+        {totalExtra > 0 && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+            <span className="text-white text-3xl font-bold">+{totalExtra}</span>
+          </div>
+        )}
       </div>
     );
   };
@@ -145,16 +175,16 @@ const GV_Blog_List: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#F6F1E4]">
+    <div className="">
       {/* Header */}
       {blogsData?.length > 0 ? (
         blogsData.map((blog: BlogsData) => (
-          <div className="pt-10 px-2">
+          <div className="pt-4 px-2">
             <div className="w-full max-w-3xl mx-auto bg-white shadow rounded-xl p-3 sm:p-4 border border-gray-200 ">
               <div className="flex items-center justify-between space-x-3 mb-3">
                 <div className="min-w-0">
                   <p className="font-semibold text-sm sm:text-base truncate">
-                    {blog.author.fullName}
+                    {blog.author?.fullName}
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500">
                     {blog.class.name} - {blog.class.level.name}
@@ -163,18 +193,38 @@ const GV_Blog_List: React.FC = () => {
                     {dayjs(blog.createdAt).format("DD-MM-YYYY hh:mm")}
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  <Link to={`/giaovien/chinhsuabaiviet/${classId}/${blog._id}`}>
-                    <Button size="sm" variant="orange">
-                      Chỉnh sửa
-                    </Button>
-                  </Link>
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    onClick={() => deleteBlogs(blog._id)}>
-                    Xoá
-                  </Button>
+                <div className="relative inline-block text-left">
+                  <button
+                    onClick={() =>
+                      setOpenMenuId((prev) =>
+                        prev === blog._id ? null : blog._id
+                      )
+                    }
+                    className="p-2 rounded-full hover:bg-gray-100 focus:outline-none">
+                    <svg
+                      className="w-5 h-5 text-gray-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20">
+                      <path d="M6 10a2 2 0 114 0 2 2 0 01-4 0zm6 0a2 2 0 114 0 2 2 0 01-4 0z" />
+                    </svg>
+                  </button>
+
+                  {openMenuId === blog._id && (
+                    <div className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md  bg-white shadow-lg ring-1 ring-[#F6F1E4] ring-opacity-5">
+                      <div className="py-1">
+                        <Link
+                          to={`/giaovien/chinhsuabaiviet/${classId}/${blog._id}`}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                          ✏️ Chỉnh sửa
+                        </Link>
+                        <button
+                          onClick={() => deleteBlogs(blog._id)}
+                          className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700">
+                          🗑️ Xoá
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -186,8 +236,8 @@ const GV_Blog_List: React.FC = () => {
                 </p>
               </div>
 
-              {/* Photos */}
-              <div>{renderPhoto(blog.images)}</div>
+              {/* Media */}
+              <div>{renderMedia(blog.images, blog.videos)}</div>
             </div>
           </div>
         ))
@@ -196,12 +246,50 @@ const GV_Blog_List: React.FC = () => {
           Chưa có bài viết nào
         </p>
       )}
+
+      <motion.div
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="fixed bottom-4 right-4 z-50">
+        <Link
+          to={`/giaovien/thembaiviet/${classId}`}
+          className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-orange-600 transition duration-300
+          text-sm md:text-base md:px-5 md:py-3">
+          <span className="text-lg md:text-xl">➕</span>
+          <span className="font-semibold hidden sm:inline">Thêm bài viết</span>
+        </Link>
+      </motion.div>
       {/* Lightbox */}
       <Lightbox
         open={open}
         close={() => setOpen(false)}
         index={index}
-        slides={currentSlides}
+        slides={currentSlides as unknown as SlideImage[]}
+        render={{
+          slide: ({ slide }) => {
+            const s = slide as CustomSlide;
+            if (s.type === "video") {
+              return (
+                <VideoPlayer
+                  src={slide.src}
+                  className="max-h-full max-w-full"
+                  controls
+                  autoPlay
+                />
+              );
+            }
+            return (
+              <img
+                src={slide.src}
+                alt="media"
+                className="max-h-full max-w-full object-contain"
+              />
+            );
+          },
+        }}
       />
     </div>
   );

@@ -3,6 +3,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { ArrowUpCircle } from "lucide-react";
 import Content from "./Content";
+import TeachersCarousel from "../HomePage2/TeachersCarousel";
 
 const HomePage = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -30,6 +31,9 @@ const HomePage = () => {
       {/* Để tránh che nội dung, thêm padding-top bằng chiều cao header */}
       <div className="pt-[250px]">
         <Content />
+
+        <TeachersCarousel className="mt-6" limit={4} />
+        
         <Footer />
       </div>
       {showScrollTop && (

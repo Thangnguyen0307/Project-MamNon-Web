@@ -6,9 +6,11 @@ const slides = [
   "/images/homepage/slide3.jpg",
 ];
 
-const HEADER_HEIGHT = 80; // px
+interface PropLanding {
+  heightLanding?: string;
+}
 
-const Landing = () => {
+const Landing: React.FC<PropLanding> = ({ heightLanding }) => {
   const [current, setCurrent] = useState(0);
   const startX = useRef<number | null>(null);
 
@@ -41,23 +43,30 @@ const Landing = () => {
   return (
     <div
       className="w-full flex items-center justify-center bg-white overflow-hidden"
-      style={{ minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`, marginTop: HEADER_HEIGHT }}
-    >
+
+      
+    
+
+      style={{ minHeight: `calc(100vh - ${heightLanding}px)` }}>
+
       <div
         className="relative w-full h-full rounded-none overflow-hidden shadow-2xl"
-        style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+        style={{ height: `calc(100vh - ${heightLanding}px)` }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onMouseDown={handleTouchStart}
-        onMouseUp={handleTouchEnd}
-      >
+        onMouseUp={handleTouchEnd}>
         {slides.map((src, idx) => (
           <img
             key={idx}
             src={src}
             alt={`Slide ${idx + 1}`}
             className={`absolute top-0 left-0 w-full h-full object-cover transition-all duration-700 ease-in-out
-              ${idx === current ? "opacity-100 scale-100 z-10" : "opacity-0 scale-105 z-0"}
+              ${
+                idx === current
+                  ? "opacity-100 scale-100 z-10"
+                  : "opacity-0 scale-105 z-0"
+              }
             `}
             draggable={false}
           />
@@ -68,7 +77,11 @@ const Landing = () => {
             <button
               key={idx}
               className={`w-2.5 h-2.5 rounded-full transition-all duration-300 border border-white
-                ${current === idx ? "bg-[#7F55B1] shadow-lg opacity-80" : "bg-gray-400 opacity-40"}
+                ${
+                  current === idx
+                    ? "bg-[#7F55B1] shadow-lg opacity-80"
+                    : "bg-gray-400 opacity-40"
+                }
               `}
               onClick={() => setCurrent(idx)}
               aria-label={`Chuyển đến slide ${idx + 1}`}

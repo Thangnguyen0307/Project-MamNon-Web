@@ -13,6 +13,10 @@ export const validateYearRange = (value: string): boolean => {
   return start <= end;
 };
 
+export const isNonEmptyString = (str: string): boolean => {
+  return typeof str === "string" && str.trim().length > 0;
+};
+
 export function toBoolean(value: string): boolean {
   return ["true", "1", "yes", "on"].includes(value.toLowerCase());
 }

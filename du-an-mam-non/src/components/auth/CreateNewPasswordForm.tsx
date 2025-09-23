@@ -58,7 +58,7 @@ export default function CreateNewPasswordForm() {
         </Link>
       </div>
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
-        <div>
+        <div className="border border-gray-200 rounded-2xl shadow-2xl p-5 bg-white">
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
               Tạo mật khẩu mới
