@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
 import TextArea from "../../components/form/input/TextArea";
@@ -42,6 +42,7 @@ interface BlogData {
 const GV_EditBlog = () => {
   const { classId, blogId } = useParams();
   const CHUNK_SIZE = 5 * 1024 * 1024;
+  const navigate = useNavigate();
   const [mount, setMount] = useState(false);
   const [uploadPercent, setUploadPercent] = useState<Record<string, number>>(
     {}
@@ -71,6 +72,7 @@ const GV_EditBlog = () => {
       [key]: value,
     }));
   };
+
   const handleFileChange = (files: FileList | null) => {
     if (!files) return;
     const selected = Array.from(files);
@@ -124,8 +126,6 @@ const GV_EditBlog = () => {
     });
   };
 
-  console.log(blogParams);
-
   const getDetailBlog = async () => {
     try {
       const response = await axiosInstance.get(
@@ -177,8 +177,6 @@ const GV_EditBlog = () => {
       const uploadedInitIds: string[] = [];
       for (const video of blogParams.videos) {
         try {
-          console.log(`🚀 Upload video: ${video.name}`);
-
           const initId = await createInit();
           uploadedInitIds.push(initId);
           console.log(initId);
@@ -190,13 +188,14 @@ const GV_EditBlog = () => {
               ...prev,
               [initId]: percent,
             }));
-
-            console.log(`✅ Uploaded chunk ${i + 1}/${video.chunks.length}`);
           }
 
           console.log(`🎉 Hoàn tất video: ${video.name}`);
-        } catch (err) {
-          console.error(`❌ Lỗi upload video: ${video.name}`, err);
+        } catch (error) {
+          const err = error as AxiosError<{ message: string }>;
+          toast.error(
+            err.response?.data?.message || "Lỗi khi cập nhật bài viết"
+          );
         }
       }
 
@@ -243,7 +242,9 @@ const GV_EditBlog = () => {
             <div className="relative flex  w-80 max-w-sm bg-white border border-gray-200 rounded-lg items-center shadow-lg p-4">
               <div className="flex-shrink-0 text-2xl mr-3">✅</div>
               <div className="">
-                <p className="text-sm text-gray-600">Tạo bài viết thành công</p>
+                <p className="text-sm text-gray-600">
+                  Cập nhật bài viết thành công
+                </p>
               </div>
               <button
                 onClick={() => toast.dismiss(t.id)}
@@ -260,6 +261,7 @@ const GV_EditBlog = () => {
       toast.error(err.response?.data?.message || "Lỗi khi cập nhật bài viết");
     } finally {
       setMount(false);
+      navigate(`/giaovien/baiviet/${classId}`);
     }
   };
 

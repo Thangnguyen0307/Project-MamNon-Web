@@ -8,11 +8,11 @@ export const GVHomePage = () => {
   return (
     <>
       <GV_Header />
-      <Landing />
+      <Landing heightLanding="450" />
       {/* Title */}
       <GV_TeachersSection />
       {/* List */}
-      <section className="bg-[#F6F1E4] pb-8">
+      <section className="bg-white pb-8">
         <Outlet />
       </section>
       <Footer />
