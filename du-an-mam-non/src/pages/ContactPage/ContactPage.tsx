@@ -18,10 +18,12 @@ const ContactPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
+    // Xử lý gửi dữ liệu tại đây
   };
 
   return (
     <div className="min-h-screen bg-[#F7FBFC] relative overflow-hidden">
+      {/* Background trang trí */}
       <div className="absolute top-0 left-0 w-1/2 h-[400px] bg-[#F7FBFC] z-0">
         <div className="absolute top-0 left-0 w-[340px] h-[340px] bg-[#FFD966] rounded-full -translate-x-1/3 -translate-y-1/4 opacity-60"></div>
         <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-[#C7B6F7] rounded-full translate-x-1/4 -translate-y-1/4 opacity-40"></div>
