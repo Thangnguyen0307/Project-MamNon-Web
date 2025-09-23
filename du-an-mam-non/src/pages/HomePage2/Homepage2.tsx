@@ -10,7 +10,7 @@ const Homepage2 = () => {
       {/* Chỉ còn header và nội dung, không còn top bar */}
       <div className="pt-[80px]">
         <Header2 />
-        <Landing />
+        <Landing heightLanding="250px" />
         <About />
         <TeachersCarousel limit={4} />
         <Footer />

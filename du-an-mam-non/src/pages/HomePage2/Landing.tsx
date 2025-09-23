@@ -7,7 +7,7 @@ const slides = [
 ];
 
 interface PropLanding {
-  heightLanding: string;
+  heightLanding?: string;
 }
 
 const Landing: React.FC<PropLanding> = ({ heightLanding }) => {
