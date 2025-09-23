@@ -19,6 +19,7 @@ import GV_AddBlog from "./pages/GiaoVien/GV_AddBlog";
 import GV_EditBlog from "./pages/GiaoVien/GV_EditBlog";
 import Homepage2 from "./pages/HomePage2/Homepage2";
 import TeachersPage from "./pages/TeacherPage/TeachersPage";
+import BlogPage from "./pages/BlogPage/BlogPage";
 import ResetPassword from "./pages/AuthPages/ResetPassword";
 import CreateNewPassword from "./pages/AuthPages/CreateNewPassword";
 
@@ -55,6 +56,7 @@ export default function App() {
           <Route element={<PublicRoute />}>
             <Route path="/" element={<Homepage2 />} />
             <Route path="/doi-ngu-giao-vien" element={<TeachersPage />} />
+            <Route path="/tin-tuc" element={<BlogPage />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/resetpassword" element={<ResetPassword />} />
             <Route path="/createnewpassword" element={<CreateNewPassword />} />
