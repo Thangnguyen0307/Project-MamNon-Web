@@ -3,7 +3,6 @@ import Header2 from "../HomePage2/Header2";
 import TeachersHero from "./TeachersHero";
 import TeachersGrid from "./TeachersGrid";
 
-
 const TeachersPage = () => {
   return (
     <div>

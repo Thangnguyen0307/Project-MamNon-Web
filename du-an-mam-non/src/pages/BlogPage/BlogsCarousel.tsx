@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import { axiosInstance } from "../../utils/axiosInstance";
 
 type ApiBlog = {
@@ -32,22 +30,7 @@ type ApiBlog = {
   updatedAt: string;
 };
 
-type ApiResponse = {
-  success: boolean;
-  message: string;
-  data: {
-    blogs: ApiBlog[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      pages: number;
-    };
-  };
-};
-
 type Props = {
-  title?: string;
   limit?: number;
   className?: string;
   bg?: string;
@@ -56,336 +39,268 @@ type Props = {
 const FALLBACK_IMAGE = "/images/cards/card-03.png";
 
 export default function BlogsCarousel({
-  title = "TIN TỨC & HOẠT ĐỘNG",
-  limit = 6,
+  limit = 12,
   className = "",
-  bg = "bg-white",
+  bg = "bg-gray-50",
 }: Props) {
   const [blogs, setBlogs] = useState<ApiBlog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchBlogs = async (page: number) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await axiosInstance.get<ApiResponse>("/api/Blogs", {
-        params: { page, limit },
-      });
-      
-      if (res.data?.success) {
-        setBlogs(res.data.data.blogs);
-        setTotalPages(res.data.data.pagination.pages);
-      } else {
-        setError("Không thể tải dữ liệu blog");
-      }
-    } catch (err) {
-      console.error("Error fetching blogs:", err);
-      setError("Có lỗi xảy ra khi tải dữ liệu");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchBlogs(currentPage);
-  }, [currentPage, limit]);
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosInstance.get("/api/Blogs", {
+          params: { limit },
+        });
+        if (res.data?.success) {
+          setBlogs(res.data.data.blogs);
+        } else {
+          setError("Không thể tải dữ liệu blog");
+        }
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+        setError("Có lỗi xảy ra khi tải dữ liệu");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handlePageChange = (page: number) => {
-    if (page !== currentPage && page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+    fetchBlogs();
+  }, [limit]);
+
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return FALLBACK_IMAGE;
+    if (imagePath.startsWith("http")) return imagePath;
+    return `${
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"
+    }${imagePath}`;
   };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
       year: "numeric",
-      month: "long",
-      day: "numeric",
     });
   };
 
-  const truncateContent = (content: string, maxLength: number = 100) => {
-    if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + "...";
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
-  const getImageUrl = (imagePath: string) => {
-    if (imagePath.startsWith('http')) return imagePath;
-    return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}${imagePath}`;
-  };
-
-  const renderPagination = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    // Previous button
-    pages.push(
-      <button
-        key="prev"
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="px-3 py-2 mx-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-      >
-        ‹
-      </button>
-    );
-
-    // Page numbers
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`px-3 py-2 mx-1 text-sm font-medium rounded-lg transition-colors duration-200 ${
-            i === currentPage
-              ? "text-white bg-gradient-to-r from-[#6c2bd9] to-[#88CE58] border-transparent"
-              : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    // Next button
-    pages.push(
-      <button
-        key="next"
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="px-3 py-2 mx-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-      >
-        ›
-      </button>
-    );
-
-    return pages;
-  };
-
-  return (
-    <section
-      className={`mx-auto w-full ${bg} py-12 md:py-16 ${className} relative overflow-hidden`}
-    >
-      {/* Background decorative elements */}
-      <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-[#88CE58]/15 to-transparent rounded-full blur-2xl transform -translate-x-1/2 -translate-y-1/2 animate-float"></div>
-      <div
-        className="absolute bottom-0 right-0 w-48 h-48 bg-gradient-to-tl from-[#6c2bd9]/15 to-transparent rounded-full blur-2xl transform translate-x-1/2 translate-y-1/2 animate-float"
-        style={{ animationDelay: "1s" }}
-      ></div>
-
-      <div className="mx-auto w-full max-w-screen-xl px-4 relative z-10">
-        {/* Title */}
-        <div className="text-center">
-          <div className="inline-block animate-bounce">
-            <span className="text-4xl">📰</span>
-          </div>
-          <h2 className="text-[22px] md:text-[28px] font-bold tracking-wide text-[#6c2bd9] mt-4 animate-fade-in-up">
-            {title}
-          </h2>
-          <div className="mx-auto mt-3 h-1 w-16 rounded-full bg-gradient-to-r from-[#88CE58] to-[#6c2bd9] animate-pulse" />
-          <p className="mt-4 text-gray-600 max-w-2xl mx-auto animate-fade-in-up delay-100">
-            Cập nhật những tin tức mới nhất và hoạt động thú vị của trường mầm non
-          </p>
-        </div>
-
-        {/* Error state */}
-        {error && (
-          <div className="mt-8 text-center">
-            <div className="inline-flex items-center px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
-              <span className="text-xl mr-2">⚠️</span>
-              {error}
-            </div>
-            <button
-              onClick={() => fetchBlogs(currentPage)}
-              className="mt-4 px-6 py-2 bg-[#6c2bd9] text-white rounded-lg hover:bg-[#5a1fb5] transition-colors"
-            >
-              Thử lại
-            </button>
-          </div>
-        )}
-
-        {/* Loading skeleton */}
-        {loading && !error && (
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: limit }).map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-[4/3] w-full rounded-2xl bg-gradient-to-br from-gray-200 to-gray-300 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] animate-shimmer"></div>
+  if (loading) {
+    return (
+      <section className={`mx-auto w-full ${bg} py-12 md:py-16 ${className}`}>
+        <div className="mx-auto w-full max-w-2xl px-4">
+          <div className="space-y-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse bg-white rounded-xl shadow-sm border border-gray-200"
+              >
+                {/* Header skeleton */}
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="h-4 w-32 bg-gray-200 rounded mb-1"></div>
+                      <div className="h-3 w-24 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-4 space-y-3">
-                  <div className="h-4 w-3/4 rounded bg-gray-200"></div>
-                  <div className="h-3 w-full rounded bg-gray-200"></div>
-                  <div className="h-3 w-2/3 rounded bg-gray-200"></div>
+
+                {/* Content skeleton */}
+                <div className="px-4 py-3">
+                  <div className="h-5 w-3/4 bg-gray-200 rounded mb-3"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-full bg-gray-200 rounded"></div>
+                    <div className="h-4 w-full bg-gray-200 rounded"></div>
+                    <div className="h-4 w-2/3 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+
+                {/* Image skeleton */}
+                <div className="w-full h-64 bg-gray-200"></div>
+
+                {/* Footer skeleton */}
+                <div className="px-4 py-3 border-t border-gray-100">
+                  <div className="flex justify-between items-center">
+                    <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                    <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-        )}
+        </div>
+      </section>
+    );
+  }
 
-        {/* Blog content */}
-        {!loading && !error && (
-          <>
-            {blogs.length === 0 ? (
-              <div className="mt-10 text-center">
-                <div className="text-6xl mb-4">📝</div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                  Chưa có bài viết nào
-                </h3>
-                <p className="text-gray-500">
-                  Hãy quay lại sau để xem những tin tức mới nhất!
-                </p>
-              </div>
-            ) : (
-              <div
-                className="mt-8 animate-fade-in-up"
-                style={{ animationDelay: "600ms" }}
+  if (error) {
+    return (
+      <section className={`mx-auto w-full ${bg} py-12 md:py-16 ${className}`}>
+        <div className="mx-auto w-full max-w-2xl px-4 text-center">
+          <div className="bg-white rounded-xl shadow-sm border border-red-200 p-8">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h3 className="text-xl font-semibold text-red-700 mb-2">{error}</h3>
+            <p className="text-gray-600 mb-4">
+              Có vẻ như có sự cố khi tải dữ liệu blog
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+            >
+              Thử lại
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className={`mx-auto w-full ${bg} py-12 md:py-16 ${className}`}>
+      <div className="mx-auto w-full max-w-2xl px-4">
+        {blogs.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 text-center py-16">
+            <div className="text-8xl mb-6">📝</div>
+            <h3 className="text-2xl font-semibold text-gray-700 mb-3">
+              Chưa có bài viết nào
+            </h3>
+            <p className="text-gray-500 text-lg">
+              Hãy quay lại sau để xem những tin tức mới nhất!
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {blogs.map((blog, index) => (
+              <article
+                key={blog._id}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300"
+                style={{ animationDelay: `${index * 150}ms` }}
               >
-                <Swiper
-                  modules={[Autoplay, Pagination, Navigation]}
-                  pagination={{
-                    clickable: true,
-                    dynamicBullets: true,
-                    dynamicMainBullets: 3,
-                  }}
-                  navigation={{
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
-                  }}
-                  autoplay={{
-                    delay: 4000,
-                    disableOnInteraction: false,
-                    pauseOnMouseEnter: true,
-                  }}
-                  spaceBetween={20}
-                  loop={blogs.length > 3}
-                  speed={800}
-                  grabCursor={true}
-                  breakpoints={{
-                    0: { slidesPerView: 1 },
-                    640: { slidesPerView: 2 },
-                    1024: { slidesPerView: 3 },
-                  }}
-                  className="blogs-swiper !pt-8 !pb-12"
-                >
-                  {blogs.map((blog, index) => (
-                    <SwiperSlide key={blog._id}>
-                      <article
-                        className="group rounded-2xl border border-gray-100 bg-white shadow-[0_2px_14px_rgba(0,0,0,0.06)] transition-all duration-500 hover:shadow-[0_6px_20px_rgba(108,43,217,0.15)] animate-fade-in-up relative overflow-hidden cursor-pointer"
-                        style={{ animationDelay: `${index * 150}ms` }}
+                {/* Author header - Facebook style */}
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                        {blog.author
+                          ? blog.author.fullName.charAt(0).toUpperCase()
+                          : "?"}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 text-sm">
+                          {blog.author ? blog.author.fullName : "Ẩn danh"}
+                        </h4>
+                        <div className="flex items-center text-xs text-gray-500 space-x-1">
+                          <span>{formatDate(blog.createdAt)}</span>
+                          <span>lúc</span>
+                          <span>{formatTime(blog.createdAt)}</span>
+                          {blog.class && (
+                            <>
+                              <span>•</span>
+                              <span className="text-blue-600 font-medium">
+                                {blog.class.level.name} - {blog.class.name}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <button className="text-gray-400 hover:text-gray-600 transition-colors p-1">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
                       >
-                        {/* Image container */}
-                        <div className="aspect-[4/3] overflow-hidden rounded-t-2xl relative">
-                          <img
-                            src={blog.images.length > 0 ? getImageUrl(blog.images[0]) : FALLBACK_IMAGE}
-                            alt={blog.title}
-                            className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110"
-                            loading="lazy"
-                            onError={(e) => {
-                              e.currentTarget.src = FALLBACK_IMAGE;
-                            }}
-                          />
-                          
-                          {/* Category badge */}
-                          <div className="absolute top-3 left-3">
-                            <span className="bg-gradient-to-r from-[#6c2bd9] to-[#88CE58] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
-                              {blog.class.level.name}
-                            </span>
-                          </div>
-
-                          {/* Media indicators */}
-                          <div className="absolute top-3 right-3 flex space-x-2">
-                            {blog.images.length > 1 && (
-                              <span className="bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                                📷 {blog.images.length}
-                              </span>
-                            )}
-                            {blog.videos.length > 0 && (
-                              <span className="bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                                🎥 {blog.videos.length}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Gradient overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-6">
-                          <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                            <span className="flex items-center">
-                              <span className="mr-1">📅</span>
-                              {formatDate(blog.createdAt)}
-                            </span>
-                            <span className="text-[#6c2bd9] font-medium">
-                              {blog.class.name}
-                            </span>
-                          </div>
-
-                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#6c2bd9] transition-colors duration-300 mb-3 line-clamp-2">
-                            {blog.title}
-                          </h3>
-
-                          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                            {truncateContent(blog.content)}
-                          </p>
-
-                          {/* Author info */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              <div className="w-8 h-8 bg-gradient-to-r from-[#6c2bd9] to-[#88CE58] rounded-full flex items-center justify-center text-white text-sm font-bold">
-                                {blog.author ? blog.author.fullName.charAt(0).toUpperCase() : "?"}
-                              </div>
-                              <div className="ml-3">
-                                <p className="text-sm font-medium text-gray-900">
-                                  {blog.author ? blog.author.fullName : "Ẩn danh"}
-                                </p>
-                                <p className="text-xs text-gray-500">Tác giả</p>
-                              </div>
-                            </div>
-                            
-                            <button className="text-[#6c2bd9] hover:text-[#88CE58] transition-colors duration-300 text-sm font-medium">
-                              Đọc thêm →
-                            </button>
-                          </div>
-                        </div>
-                      </article>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-
-                {/* Custom navigation buttons */}
-                <div className="flex justify-center items-center mt-6 space-x-4">
-                  <button className="swiper-button-prev !static !w-10 !h-10 !bg-white !rounded-full !shadow-lg !border border-gray-200 hover:!bg-gray-50 transition-colors duration-200 !text-[#6c2bd9] !text-lg !font-bold after:!text-sm after:!font-bold">
-                  </button>
-                  <button className="swiper-button-next !static !w-10 !h-10 !bg-white !rounded-full !shadow-lg !border border-gray-200 hover:!bg-gray-50 transition-colors duration-200 !text-[#6c2bd9] !text-lg !font-bold after:!text-sm after:!font-bold">
-                  </button>
+                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="mt-8 flex justify-center items-center">
-                    <div className="flex items-center space-x-1">
-                      {renderPagination()}
-                    </div>
-                    <div className="ml-6 text-sm text-gray-600">
-                      Trang {currentPage} / {totalPages}
-                    </div>
+                {/* Post content */}
+                <div className="px-4 py-3">
+                  {/* Title */}
+                  {blog.title && (
+                    <h3 className="text-gray-900 font-medium text-lg mb-3 leading-relaxed">
+                      {blog.title}
+                    </h3>
+                  )}
+
+                  {/* Content */}
+                  <div className="text-gray-700 text-sm leading-relaxed mb-4">
+                    <p className="whitespace-pre-line">
+                      {blog.content.length > 300 ? (
+                        <>
+                          {blog.content.substring(0, 300)}...
+                          <button className="text-blue-600 hover:text-blue-800 font-medium ml-1">
+                            Xem thêm
+                          </button>
+                        </>
+                      ) : (
+                        blog.content
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Images/Media */}
+                {blog.images && blog.images.length > 0 && (
+                  <div className="relative">
+                    <img
+                      src={getImageUrl(blog.images[0])}
+                      alt={blog.title}
+                      className="w-full h-auto max-h-96 object-cover cursor-pointer"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.src = FALLBACK_IMAGE;
+                      }}
+                    />
+
+                    {/* Media count overlay */}
+                    {(blog.images.length > 1 ||
+                      (blog.videos && blog.videos.length > 0)) && (
+                      <div className="absolute top-4 left-4 flex space-x-2">
+                        {blog.images.length > 1 && (
+                          <span className="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full font-medium">
+                            📷 {blog.images.length} ảnh
+                          </span>
+                        )}
+                        {blog.videos && blog.videos.length > 0 && (
+                          <span className="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full font-medium">
+                            🎥 {blog.videos.length} video
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-            )}
-          </>
+
+                {/* Post actions - simplified */}
+                <div className="px-4 py-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between text-gray-600">
+                    <div className="flex items-center space-x-1 text-xs">
+                      <span className="text-gray-500">
+                        Đăng bởi {blog.author?.fullName || "Ẩn danh"}
+                      </span>
+                    </div>
+
+                    <button className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
+                      Xem chi tiết →
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
         )}
       </div>
     </section>

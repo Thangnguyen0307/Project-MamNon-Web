@@ -3,6 +3,7 @@ import Footer from "./Footer2";
 import Header2 from "./Header2";
 import Landing from "./Landing";
 import TeachersCarousel from "./TeachersCarousel";
+import ClassCarousel from "../ClassPage/ClassCarousel";
 
 const Homepage2 = () => {
   return (
@@ -13,6 +14,7 @@ const Homepage2 = () => {
         <Landing />
         <About />
         <TeachersCarousel limit={4} />
+        <ClassCarousel limit={4} />
         <Footer />
       </div>
     </div>
