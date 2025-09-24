@@ -1,34 +1,54 @@
 import { useEffect, useState } from "react";
+import Lightbox, { SlideImage } from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 import { axiosInstance } from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths";
+import { AxiosError } from "axios";
+import toast from "react-hot-toast";
+import dayjs from "dayjs";
+import VideoPlayer from "../../components/common/VideoPlayer";
+import { motion } from "framer-motion";
 
-type ApiBlog = {
+interface VideoSlide {
+  type: "video";
+  src: string;
+}
+type CustomSlide = SlideImage | VideoSlide;
+
+export interface Author {
+  id: string;
+  email: string;
+  fullName: string;
+}
+
+export interface Level {
+  _id: string;
+  name: string;
+}
+
+interface ClassInfo {
+  id: string;
+  name: string;
+  level: Level;
+}
+
+interface VideoInfo {
+  _id: string;
+  m3u8: string;
+  thumbnail: string;
+}
+
+export interface BlogsData {
   _id: string;
   title: string;
   content: string;
   images: string[];
-  videos: Array<{
-    _id: string;
-    m3u8: string;
-    thumbnail: string;
-    status: string;
-    createdAt: string;
-  }>;
-  author: {
-    _id: string;
-    email: string;
-    fullName: string;
-  } | null;
-  class: {
-    _id: string;
-    name: string;
-    level: {
-      _id: string;
-      name: string;
-    };
-  };
+  videos: VideoInfo[];
+  author: Author;
+  class: ClassInfo;
   createdAt: string;
   updatedAt: string;
-};
+}
 
 type Props = {
   limit?: number;
@@ -36,128 +56,153 @@ type Props = {
   bg?: string;
 };
 
-const FALLBACK_IMAGE = "/images/cards/card-03.png";
-
 export default function BlogsCarousel({
-  limit = 12,
+  limit = 5, // Reduced for vertical layout
   className = "",
   bg = "bg-gray-50",
 }: Props) {
-  const [blogs, setBlogs] = useState<ApiBlog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const BASE_MEDIA_URL = "https://techleaf.pro/projects/mam-non-media";
+  const [open, setOpen] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [blogsData, setBlogsData] = useState<BlogsData[]>([]);
+  const [currentSlides, setCurrentSlides] = useState<CustomSlide[]>([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: limit,
+    total: 0,
+    pages: 0,
+  });
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        setLoading(true);
-        const res = await axiosInstance.get("/api/Blogs", {
-          params: { limit },
-        });
-        if (res.data?.success) {
-          setBlogs(res.data.data.blogs);
-        } else {
-          setError("Không thể tải dữ liệu blog");
-        }
-      } catch (error) {
-        console.error("Error fetching blogs:", error);
-        setError("Có lỗi xảy ra khi tải dữ liệu");
-      } finally {
-        setLoading(false);
+    fetchAllBlogs();
+  }, [pagination.page, limit]);
+
+  const fetchAllBlogs = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        `${API_PATHS.BLOG.GET_ALL_BLOGS}?page=${pagination.page}&limit=${pagination.limit}`
+      );
+      if (response.data.data.blogs?.length > 0) {
+        const mapped = mapBlogsWithFullImages(response.data.data.blogs);
+        setBlogsData(mapped);
+        setPagination(response.data.data.pagination);
       }
-    };
-
-    fetchBlogs();
-  }, [limit]);
-
-  const getImageUrl = (imagePath: string) => {
-    if (!imagePath) return FALLBACK_IMAGE;
-    if (imagePath.startsWith("http")) return imagePath;
-    return `${
-      import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"
-    }${imagePath}`;
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      if (error.response && error.response.data.message) {
+        toast.error(error.response.data.message);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
+  const mapBlogsWithFullImages = (blogs: BlogsData[]): BlogsData[] => {
+    return blogs.map((blog) => ({
+      ...blog,
+      images: blog.images?.map((img) => `${BASE_MEDIA_URL}${img}`) || [],
+      videos:
+        blog.videos?.map((video) => ({
+          ...video,
+          m3u8: `${BASE_MEDIA_URL}${video.m3u8}`,
+        })) || [],
+    }));
   };
 
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const buildAllMedia = (
+    images: string[] | null,
+    videos: VideoInfo[] | null
+  ) => {
+    return [
+      ...(images || []).map((u) => ({ src: u, type: "image" as const })),
+      ...(videos || []).map((v) => ({
+        src: v.m3u8,
+        type: "video" as const,
+      })),
+    ];
+  };
+
+  const renderMedia = (images: string[] | null, videos: VideoInfo[] | null) => {
+    const allMedia = buildAllMedia(images, videos);
+
+    if (allMedia.length === 0) return null;
+    const totalExtra = allMedia.length - 1;
+
+    return (
+      <div className="relative">
+        <div
+          className="cursor-pointer"
+          onClick={() => {
+            const slides = allMedia.map((m) => ({
+              src: m.src,
+              type: m.type,
+            }));
+            setCurrentSlides(slides as unknown as CustomSlide[]);
+            setIndex(0);
+            setOpen(true);
+          }}
+        >
+          {allMedia[0].type === "video" ? (
+            <VideoPlayer
+              src={allMedia[0].src}
+              className="w-full aspect-video object-cover rounded-lg"
+              controls
+            />
+          ) : (
+            <img
+              src={allMedia[0].src}
+              alt="media preview"
+              className="w-full aspect-video object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+            />
+          )}
+        </div>
+
+        {totalExtra > 0 && (
+          <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium">
+            +{totalExtra} thêm
+          </div>
+        )}
+      </div>
+    );
   };
 
   if (loading) {
     return (
       <section className={`mx-auto w-full ${bg} py-12 md:py-16 ${className}`}>
-        <div className="mx-auto w-full max-w-2xl px-4">
+        <div className="mx-auto w-full max-w-4xl px-4">
           <div className="space-y-6">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div
+              <motion.div
                 key={i}
-                className="animate-pulse bg-white rounded-xl shadow-sm border border-gray-200"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="animate-pulse bg-white rounded-xl shadow-lg border border-gray-200"
               >
-                {/* Header skeleton */}
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                <div className="p-6 border-b border-gray-100">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
                     <div className="flex-1">
-                      <div className="h-4 w-32 bg-gray-200 rounded mb-1"></div>
-                      <div className="h-3 w-24 bg-gray-200 rounded"></div>
+                      <div className="h-5 w-40 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-3 w-32 bg-gray-200 rounded mb-1"></div>
+                      <div className="h-3 w-28 bg-gray-200 rounded"></div>
                     </div>
                   </div>
                 </div>
-
-                {/* Content skeleton */}
-                <div className="px-4 py-3">
-                  <div className="h-5 w-3/4 bg-gray-200 rounded mb-3"></div>
-                  <div className="space-y-2">
+                <div className="p-6">
+                  <div className="h-6 w-3/4 bg-gray-200 rounded mb-4"></div>
+                  <div className="space-y-2 mb-6">
                     <div className="h-4 w-full bg-gray-200 rounded"></div>
                     <div className="h-4 w-full bg-gray-200 rounded"></div>
                     <div className="h-4 w-2/3 bg-gray-200 rounded"></div>
                   </div>
+                  <div className="w-full h-64 bg-gray-200 rounded-lg"></div>
                 </div>
-
-                {/* Image skeleton */}
-                <div className="w-full h-64 bg-gray-200"></div>
-
-                {/* Footer skeleton */}
-                <div className="px-4 py-3 border-t border-gray-100">
-                  <div className="flex justify-between items-center">
-                    <div className="h-3 w-20 bg-gray-200 rounded"></div>
-                    <div className="h-4 w-24 bg-gray-200 rounded"></div>
-                  </div>
-                </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className={`mx-auto w-full ${bg} py-12 md:py-16 ${className}`}>
-        <div className="mx-auto w-full max-w-2xl px-4 text-center">
-          <div className="bg-white rounded-xl shadow-sm border border-red-200 p-8">
-            <div className="text-6xl mb-4">⚠️</div>
-            <h3 className="text-xl font-semibold text-red-700 mb-2">{error}</h3>
-            <p className="text-gray-600 mb-4">
-              Có vẻ như có sự cố khi tải dữ liệu blog
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
-            >
-              Thử lại
-            </button>
           </div>
         </div>
       </section>
@@ -166,143 +211,224 @@ export default function BlogsCarousel({
 
   return (
     <section className={`mx-auto w-full ${bg} py-12 md:py-16 ${className}`}>
-      <div className="mx-auto w-full max-w-2xl px-4">
-        {blogs.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 text-center py-16">
-            <div className="text-8xl mb-6">📝</div>
-            <h3 className="text-2xl font-semibold text-gray-700 mb-3">
-              Chưa có bài viết nào
-            </h3>
-            <p className="text-gray-500 text-lg">
-              Hãy quay lại sau để xem những tin tức mới nhất!
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {blogs.map((blog, index) => (
-              <article
+      <div className="mx-auto w-full max-w-4xl px-4">
+        {blogsData?.length > 0 ? (
+          <div className="space-y-8">
+            {blogsData.map((blog: BlogsData, index) => (
+              <motion.div
                 key={blog._id}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300"
-                style={{ animationDelay: `${index * 150}ms` }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-500 border border-gray-100"
               >
-                {/* Author header - Facebook style */}
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                        {blog.author
-                          ? blog.author.fullName.charAt(0).toUpperCase()
-                          : "?"}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 text-sm">
-                          {blog.author ? blog.author.fullName : "Ẩn danh"}
-                        </h4>
-                        <div className="flex items-center text-xs text-gray-500 space-x-1">
-                          <span>{formatDate(blog.createdAt)}</span>
-                          <span>lúc</span>
-                          <span>{formatTime(blog.createdAt)}</span>
-                          {blog.class && (
-                            <>
-                              <span>•</span>
-                              <span className="text-blue-600 font-medium">
-                                {blog.class.level.name} - {blog.class.name}
-                              </span>
-                            </>
-                          )}
-                        </div>
+                {/* Author header */}
+                <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-[#6c2bd9] to-[#88CE58] rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                      {blog.author?.fullName?.charAt(0)?.toUpperCase() || "?"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-gray-900 text-xl mb-1">
+                        {blog.author?.fullName || "Ẩn danh"}
+                      </p>
+                      <div className="flex flex-col text-sm text-gray-600">
+                        <p className="font-medium">
+                          {blog.class?.name} - {blog.class?.level?.name}
+                        </p>
+                        <p className="text-gray-500">
+                          {dayjs(blog.createdAt).format("DD/MM/YYYY • HH:mm")}
+                        </p>
                       </div>
                     </div>
-                    <button className="text-gray-400 hover:text-gray-600 transition-colors p-1">
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-                      </svg>
-                    </button>
                   </div>
                 </div>
 
-                {/* Post content */}
-                <div className="px-4 py-3">
-                  {/* Title */}
-                  {blog.title && (
-                    <h3 className="text-gray-900 font-medium text-lg mb-3 leading-relaxed">
-                      {blog.title}
-                    </h3>
-                  )}
-
-                  {/* Content */}
-                  <div className="text-gray-700 text-sm leading-relaxed mb-4">
-                    <p className="whitespace-pre-line">
-                      {blog.content.length > 300 ? (
-                        <>
-                          {blog.content.substring(0, 300)}...
-                          <button className="text-blue-600 hover:text-blue-800 font-medium ml-1">
-                            Xem thêm
-                          </button>
-                        </>
-                      ) : (
-                        blog.content
-                      )}
-                    </p>
-                  </div>
+                {/* Content */}
+                <div className="px-6 py-5">
+                  <h3 className="font-bold text-2xl text-gray-900 mb-4 leading-tight">
+                    {blog.title}
+                  </h3>
+                  <p className="text-gray-700 text-base leading-relaxed mb-6">
+                    {blog.content}
+                  </p>
                 </div>
 
-                {/* Images/Media */}
-                {blog.images && blog.images.length > 0 && (
-                  <div className="relative">
-                    <img
-                      src={getImageUrl(blog.images[0])}
-                      alt={blog.title}
-                      className="w-full h-auto max-h-96 object-cover cursor-pointer"
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.src = FALLBACK_IMAGE;
-                      }}
-                    />
+                {/* Media */}
+                <div className="px-6 pb-6">
+                  {renderMedia(blog.images, blog.videos)}
+                </div>
 
-                    {/* Media count overlay */}
-                    {(blog.images.length > 1 ||
-                      (blog.videos && blog.videos.length > 0)) && (
-                      <div className="absolute top-4 left-4 flex space-x-2">
-                        {blog.images.length > 1 && (
-                          <span className="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full font-medium">
-                            📷 {blog.images.length} ảnh
-                          </span>
-                        )}
-                        {blog.videos && blog.videos.length > 0 && (
-                          <span className="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full font-medium">
-                            🎥 {blog.videos.length} video
-                          </span>
-                        )}
-                      </div>
+                {/* Footer with stats only */}
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                  <div className="flex items-center space-x-6 text-sm text-gray-600">
+                    {blog.images?.length > 0 && (
+                      <span className="flex items-center gap-2 font-medium">
+                        <span className="text-blue-500">📷</span>
+                        {blog.images.length} ảnh
+                      </span>
+                    )}
+                    {blog.videos?.length > 0 && (
+                      <span className="flex items-center gap-2 font-medium">
+                        <span className="text-red-500">🎥</span>
+                        {blog.videos.length} video
+                      </span>
                     )}
                   </div>
-                )}
-
-                {/* Post actions - simplified */}
-                <div className="px-4 py-3 border-t border-gray-100">
-                  <div className="flex items-center justify-between text-gray-600">
-                    <div className="flex items-center space-x-1 text-xs">
-                      <span className="text-gray-500">
-                        Đăng bởi {blog.author?.fullName || "Ẩn danh"}
-                      </span>
-                    </div>
-
-                    <button className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
-                      Xem chi tiết →
-                    </button>
-                  </div>
                 </div>
-              </article>
+              </motion.div>
             ))}
           </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-16"
+          >
+            <div className="bg-white rounded-2xl shadow-xl p-12 max-w-md mx-auto">
+              <div className="text-8xl mb-6">📝</div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                Chưa có bài viết nào
+              </h3>
+              <p className="text-gray-600 text-lg">
+                Hãy quay lại sau để xem những tin tức mới nhất từ trường mầm
+                non!
+              </p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Pagination Controls */}
+        {blogsData?.length > 0 && pagination.pages > 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex justify-center items-center space-x-4 mt-12"
+          >
+            {/* Previous Button */}
+            <button
+              onClick={() =>
+                setPagination((prev) => ({
+                  ...prev,
+                  page: Math.max(1, prev.page - 1),
+                }))
+              }
+              disabled={pagination.page === 1 || loading}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Trước
+            </button>
+
+            {/* Page Numbers */}
+            <div className="flex items-center space-x-2">
+              {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
+                const startPage = Math.max(1, pagination.page - 2);
+                const pageNumber = startPage + i;
+                if (pageNumber > pagination.pages) return null;
+
+                return (
+                  <button
+                    key={pageNumber}
+                    onClick={() =>
+                      setPagination((prev) => ({ ...prev, page: pageNumber }))
+                    }
+                    disabled={loading}
+                    className={`w-10 h-10 rounded-lg font-medium transition-all duration-300 ${
+                      pagination.page === pageNumber
+                        ? "bg-gradient-to-r from-[#6c2bd9] to-[#88CE58] text-white shadow-lg"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Next Button */}
+            <button
+              onClick={() =>
+                setPagination((prev) => ({
+                  ...prev,
+                  page: Math.min(prev.pages, prev.page + 1),
+                }))
+              }
+              disabled={pagination.page === pagination.pages || loading}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+            >
+              Tiếp
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </motion.div>
+        )}
+
+        {/* Page Info */}
+        {blogsData?.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center mt-4 text-sm text-gray-600"
+          >
+            Trang {pagination.page} / {pagination.pages} • Tổng{" "}
+            {pagination.total} bài viết
+          </motion.div>
         )}
       </div>
+
+      {/* Lightbox */}
+      <Lightbox
+        open={open}
+        close={() => setOpen(false)}
+        index={index}
+        slides={currentSlides as unknown as SlideImage[]}
+        render={{
+          slide: ({ slide }) => {
+            const s = slide as CustomSlide;
+            if (s.type === "video") {
+              return (
+                <VideoPlayer
+                  src={slide.src}
+                  className="max-h-full max-w-full"
+                  controls
+                  autoPlay
+                />
+              );
+            }
+            return (
+              <img
+                src={slide.src}
+                alt="media"
+                className="max-h-full max-w-full object-contain"
+              />
+            );
+          },
+        }}
+      />
     </section>
   );
 }

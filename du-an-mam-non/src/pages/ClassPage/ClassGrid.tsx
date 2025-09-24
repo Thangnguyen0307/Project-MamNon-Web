@@ -11,14 +11,6 @@ type ApiClass = {
     createdAt: string;
     updatedAt: string;
   };
-  teachers: Array<{
-    id: string;
-    email: string;
-    role: string;
-    fullName: string;
-    isActive: boolean;
-    avatarUrl: string | null;
-  }>;
   createdAt: string;
   updatedAt: string;
 };
@@ -36,8 +28,6 @@ type ApiResponse = {
     };
   };
 };
-
-const FALLBACK_IMAGE = "/images/carousel/carousel-02.png";
 
 const ClassGrid = () => {
   const [classes, setClasses] = useState<ApiClass[]>([]);
@@ -152,13 +142,6 @@ const ClassGrid = () => {
 
   return (
     <section className="py-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-10 w-32 h-32 border-4 border-[#88CE58] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-24 h-24 bg-[#6c2bd9] rounded-full animate-bounce"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 border-2 border-[#F97A00] rounded-full animate-ping"></div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         {/* Section title */}
         <div className="text-center mb-16">
@@ -216,19 +199,32 @@ const ClassGrid = () => {
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="animate-pulse">
                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                  <div className="aspect-[4/3] bg-gradient-to-br from-gray-200 to-gray-300 relative">
+                  {/* Header skeleton */}
+                  <div className="h-20 bg-gradient-to-r from-gray-200 to-gray-300 relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] animate-shimmer"></div>
+                    <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+                      <div className="bg-white shadow-xl px-4 py-2 rounded-full w-20 h-8"></div>
+                    </div>
                   </div>
-                  <div className="p-6">
-                    <div className="h-6 bg-gray-200 rounded mb-3 relative overflow-hidden">
+
+                  <div className="px-6 pt-8 pb-6 text-center">
+                    {/* Title skeleton */}
+                    <div className="h-6 bg-gray-200 rounded mb-6 mx-auto w-3/4 relative overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] animate-shimmer"></div>
                     </div>
-                    <div className="h-4 bg-gray-200 rounded mb-2 w-2/3 relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] animate-shimmer"></div>
+
+                    {/* Info skeleton */}
+                    <div className="flex justify-center items-center gap-3 mb-6">
+                      <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                      <div className="text-left">
+                        <div className="w-16 h-3 bg-gray-200 rounded mb-1"></div>
+                        <div className="w-20 h-4 bg-gray-200 rounded"></div>
+                      </div>
                     </div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2 relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] animate-shimmer"></div>
-                    </div>
+
+                    <div className="w-16 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-4/5 mx-auto mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-2/3 mx-auto"></div>
                   </div>
                 </div>
               </div>
@@ -239,105 +235,87 @@ const ClassGrid = () => {
             {filteredClasses.map((classItem, index) => (
               <div
                 key={classItem.id}
-                className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden animate-fade-in-up"
+                className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden animate-fade-in-up relative"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                {/* Class image */}
-                <div className="aspect-[4/3] overflow-hidden relative">
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${getLevelColor(
-                      classItem.level.name
-                    )} opacity-90`}
-                  ></div>
-
-                  {/* Decorative elements */}
+                {/* Gradient Header */}
+                <div
+                  className={`h-20 bg-gradient-to-r ${getLevelColor(
+                    classItem.level.name
+                  )} relative overflow-hidden`}
+                >
+                  {/* Decorative pattern */}
                   <div className="absolute inset-0 opacity-30">
-                    <div className="absolute top-4 left-4 text-4xl animate-float">
+                    <div className="absolute top-3 left-4 text-2xl animate-float">
                       {getLevelIcon(classItem.level.name)}
                     </div>
-                    <div className="absolute top-4 right-4 text-2xl animate-bounce">
-                      🎨
+                    <div className="absolute top-3 right-6 text-xl animate-bounce">
+                      ✨
                     </div>
-                    <div className="absolute bottom-4 left-4 text-2xl animate-pulse">
-                      📖
-                    </div>
-                    <div className="absolute bottom-4 right-4 text-2xl animate-spin-slow">
-                      🌟
+                    <div className="absolute bottom-2 right-4 text-lg animate-pulse">
+                      📚
                     </div>
                   </div>
 
-                  <img
-                    src={FALLBACK_IMAGE}
-                    alt={classItem.name}
-                    className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110 mix-blend-overlay"
-                    loading="lazy"
-                  />
-
-                  {/* Class level badge */}
-                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <div className="bg-white/90 backdrop-blur-sm text-gray-800 px-4 py-2 rounded-full text-sm font-semibold shadow-lg border-2 border-white">
-                      {getLevelIcon(classItem.level.name)}{" "}
-                      {classItem.level.name}
+                  {/* Level badge */}
+                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-white shadow-xl px-4 py-2 rounded-full flex items-center gap-2 border-4 border-white">
+                      <span className="text-lg">
+                        {getLevelIcon(classItem.level.name)}
+                      </span>
+                      <span className="text-sm font-bold text-gray-800">
+                        {classItem.level.name}
+                      </span>
                     </div>
                   </div>
-
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
                 </div>
 
                 {/* Class content */}
-                <div className="p-6">
+                <div className="px-6 pt-8 pb-6 text-center">
                   {/* Class name */}
-                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#6c2bd9] transition-colors duration-300 mb-3">
+                  <h3 className="text-xl font-bold text-gray-900 mb-6 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#6c2bd9] group-hover:to-[#88CE58] transition-all duration-300">
                     {classItem.name}
                   </h3>
 
-                  {/* School year */}
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                    <span className="text-[#F97A00]">📅</span>
-                    <span>Năm học: {classItem.schoolYear}</span>
-                  </div>
-
-                  {/* Teachers */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                      <span className="text-[#6c2bd9]">👩‍🏫</span>
-                      <span>Giáo viên:</span>
+                  {/* School year with icon */}
+                  <div className="flex items-center justify-center gap-3 mb-6">
+                    <div
+                      className={`p-3 rounded-full bg-gradient-to-r ${getLevelColor(
+                        classItem.level.name
+                      )} bg-opacity-20`}
+                    >
+                      <span className="text-xl">📅</span>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {classItem.teachers.map((teacher) => (
-                        <span
-                          key={teacher.id}
-                          className="bg-gradient-to-r from-[#6c2bd9]/10 to-[#88CE58]/10 text-[#6c2bd9] text-xs px-3 py-1 rounded-full border border-[#6c2bd9]/20 hover:bg-[#6c2bd9]/20 transition-colors"
-                        >
-                          {teacher.fullName}
-                        </span>
-                      ))}
+                    <div className="text-left">
+                      <p className="text-sm text-gray-500 font-medium">
+                        Năm học
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {classItem.schoolYear}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Students count (mock data) */}
-                  <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#88CE58]">👶</span>
-                      <span>
-                        {Math.floor(Math.random() * 10) + 15} học sinh
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#F97A00]">⭐</span>
-                      <span>4.8/5</span>
-                    </div>
-                  </div>
+                  {/* Decorative element */}
+                  <div
+                    className={`mx-auto w-16 h-1 rounded-full bg-gradient-to-r ${getLevelColor(
+                      classItem.level.name
+                    )} mb-4`}
+                  ></div>
 
-                  {/* Action button */}
-                  <button className="w-full bg-gradient-to-r from-[#6c2bd9] to-[#88CE58] text-white py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 hover:from-[#88CE58] hover:to-[#6c2bd9]">
-                    Xem chi tiết lớp học 📚
-                  </button>
+                  {/* Description */}
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Lớp học chất lượng cao với môi trường thân thiện và chương
+                    trình giáo dục toàn diện
+                  </p>
                 </div>
 
-                {/* Enhanced border hover effect */}
-                <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-[#88CE58] group-hover:to-[#6c2bd9] transition-all duration-500 pointer-events-none opacity-0 group-hover:opacity-50"></div>
+                {/* Hover effect overlay */}
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${getLevelColor(
+                    classItem.level.name
+                  )} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl pointer-events-none`}
+                ></div>
               </div>
             ))}
           </div>

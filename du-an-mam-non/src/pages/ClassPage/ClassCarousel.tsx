@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { axiosInstance } from "../../utils/axiosInstance";
 
 type ApiClass = {
@@ -11,14 +12,6 @@ type ApiClass = {
     createdAt: string;
     updatedAt: string;
   };
-  teachers: Array<{
-    id: string;
-    email: string;
-    role: string;
-    fullName: string;
-    isActive: boolean;
-    avatarUrl: string | null;
-  }>;
   createdAt: string;
   updatedAt: string;
 };
@@ -36,8 +29,6 @@ type ApiResponse = {
     };
   };
 };
-
-const FALLBACK_IMAGE = "/images/carousel/carousel-01.png";
 
 interface ClassCarouselProps {
   limit?: number; // Giới hạn số lượng card hiển thị
@@ -175,12 +166,6 @@ const ClassCarousel = ({ limit }: ClassCarouselProps) => {
 
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-10 w-32 h-32 border-4 border-[#88CE58] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-24 h-24 bg-[#6c2bd9] rounded-full animate-bounce"></div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         {/* Section title */}
         <div className="text-center mb-12">
@@ -195,8 +180,7 @@ const ClassCarousel = ({ limit }: ClassCarouselProps) => {
             className="text-lg text-gray-600 max-w-2xl mx-auto animate-fade-in-up"
             style={{ animationDelay: "200ms" }}
           >
-            Khám phá những lớp học đặc biệt với đội ngũ giáo viên giàu kinh
-            nghiệm
+            Khám phá các lớp học với chương trình giáo dục toàn diện
           </p>
         </div>
 
@@ -213,17 +197,10 @@ const ClassCarousel = ({ limit }: ClassCarouselProps) => {
                   <div key={classItem.id} className="min-w-full relative">
                     {/* Background gradient */}
                     <div
-                      className={`absolute inset-0 bg-gradient-to-r ${getLevelColor(
+                      className={`w-full h-[400px] md:h-[500px] bg-gradient-to-r ${getLevelColor(
                         classItem.level.name
-                      )} opacity-90`}
+                      )} rounded-2xl`}
                     ></div>
-
-                    {/* Background image */}
-                    <img
-                      src={FALLBACK_IMAGE}
-                      alt={classItem.name}
-                      className="w-full h-[400px] md:h-[500px] object-cover mix-blend-overlay"
-                    />
 
                     {/* Content overlay */}
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -250,71 +227,6 @@ const ClassCarousel = ({ limit }: ClassCarouselProps) => {
                         >
                           📅 Năm học: {classItem.schoolYear}
                         </p>
-
-                        {/* Teachers */}
-                        <div
-                          className="animate-fade-in-up"
-                          style={{ animationDelay: "400ms" }}
-                        >
-                          <p className="text-lg mb-3 text-white/90">
-                            👩‍🏫 Giáo viên:
-                          </p>
-                          <div className="flex flex-wrap justify-center gap-3">
-                            {classItem.teachers.map((teacher) => (
-                              <span
-                                key={teacher.id}
-                                className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium border border-white/30"
-                              >
-                                {teacher.fullName}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Stats */}
-                        <div
-                          className="flex justify-center gap-8 mt-8 animate-fade-in-up"
-                          style={{ animationDelay: "600ms" }}
-                        >
-                          <div className="text-center">
-                            <div className="text-2xl font-bold">
-                              {Math.floor(Math.random() * 10) + 15}
-                            </div>
-                            <div className="text-sm text-white/80">
-                              Học sinh
-                            </div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-2xl font-bold">4.8</div>
-                            <div className="text-sm text-white/80">
-                              Đánh giá
-                            </div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-2xl font-bold">
-                              {classItem.teachers.length}
-                            </div>
-                            <div className="text-sm text-white/80">
-                              Giáo viên
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Decorative elements */}
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                      <div className="absolute top-10 left-10 text-4xl animate-float opacity-30">
-                        📚
-                      </div>
-                      <div className="absolute top-20 right-20 text-3xl animate-bounce opacity-30">
-                        🎨
-                      </div>
-                      <div className="absolute bottom-20 left-20 text-3xl animate-pulse opacity-30">
-                        ⭐
-                      </div>
-                      <div className="absolute bottom-10 right-10 text-4xl animate-spin-slow opacity-30">
-                        🌟
                       </div>
                     </div>
                   </div>
@@ -381,9 +293,12 @@ const ClassCarousel = ({ limit }: ClassCarouselProps) => {
 
         {/* View all button */}
         <div className="text-center mt-12">
-          <button className="bg-gradient-to-r from-[#6c2bd9] to-[#88CE58] text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 hover:from-[#88CE58] hover:to-[#6c2bd9]">
+          <Link
+            to="/lop-hoc"
+            className="bg-gradient-to-r from-[#6c2bd9] to-[#88CE58] text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 hover:from-[#88CE58] hover:to-[#6c2bd9] inline-block"
+          >
             Xem tất cả lớp học 🎓
-          </button>
+          </Link>
         </div>
       </div>
     </section>
