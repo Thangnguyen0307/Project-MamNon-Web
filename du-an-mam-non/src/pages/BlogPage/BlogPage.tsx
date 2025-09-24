@@ -8,7 +8,6 @@ const BlogPage = () => {
       {/* Header section */}
       <div className="pt-[80px]">
         <Header2 />
-
         {/* Hero section */}
         <div className="relative bg-gradient-to-r from-[#6c2bd9] to-[#88CE58] py-16 overflow-hidden">
           {/* Background decorative elements */}
@@ -34,7 +33,6 @@ const BlogPage = () => {
 
         {/* Blog content */}
         <BlogsCarousel limit={9} />
-
         <Footer />
       </div>
     </div>

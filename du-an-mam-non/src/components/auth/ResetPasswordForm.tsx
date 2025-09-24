@@ -75,6 +75,7 @@ export default function ResetPasswordForm() {
                     placeholder="info@gmail.com"
                     value={email}
                     onChange={({ target }) => setEmail(target.value)}
+                    required
                   />
                 </div>
                 {error && (

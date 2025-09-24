@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import Lightbox, { SlideImage } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { axiosInstance } from "../../utils/axiosInstance";
-import { API_PATHS } from "../../utils/apiPaths";
+import { API_PATHS, BASE_URL_MEDIA } from "../../utils/apiPaths";
 import { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { Link, useParams } from "react-router";
 import VideoPlayer from "../../components/common/VideoPlayer";
 import { motion } from "framer-motion";
+import Pagination from "../../components/common/Pagination";
 
 interface VideoSlide {
   type: "video";
@@ -53,7 +54,6 @@ export interface BlogsData {
 
 const GV_Blog_List: React.FC = () => {
   const { classId } = useParams();
-  const BASE_MEDIA_URL = "https://techleaf.pro/projects/mam-non-media";
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -92,14 +92,21 @@ const GV_Blog_List: React.FC = () => {
     }
   };
 
+  const setPage = (key: string, value: number) => {
+    setPagination((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   const mapBlogsWithFullImages = (blogs: BlogsData[]): BlogsData[] => {
     return blogs.map((blog) => ({
       ...blog,
-      images: blog.images?.map((img) => `${BASE_MEDIA_URL}${img}`) || [],
+      images: blog.images?.map((img) => `${BASE_URL_MEDIA}${img}`) || [],
       videos:
         blog.videos?.map((video) => ({
           ...video,
-          m3u8: `${BASE_MEDIA_URL}${video.m3u8}`,
+          m3u8: `${BASE_URL_MEDIA}${video.m3u8}`,
         })) || [],
     }));
   };
@@ -246,6 +253,16 @@ const GV_Blog_List: React.FC = () => {
           Chưa có bài viết nào
         </p>
       )}
+
+      <div className="max-w-3xl mt-2 mx-auto">
+        <Pagination
+          total={pagination.total}
+          limit={pagination.limit}
+          current={pagination.page}
+          setPage={setPage}
+          removeBorder={true}
+        />
+      </div>
 
       <motion.div
         whileHover={{ scale: 1.1 }}

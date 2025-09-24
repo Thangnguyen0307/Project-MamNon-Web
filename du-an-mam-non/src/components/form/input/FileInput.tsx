@@ -4,7 +4,7 @@ interface FileInputProps {
   className?: string;
   multiple?: boolean;
   accept?: string;
-  onFilesSelected: (files: FileList | null) => void;
+  onFilesSelected: (files: File[]) => void;
 }
 
 const FileInput: FC<FileInputProps> = ({
@@ -15,7 +15,9 @@ const FileInput: FC<FileInputProps> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onFilesSelected(e.target.files);
+    const files = e.target.files;
+    const selectedFiles = files ? Array.from(files).slice(0, 1) : [];
+    onFilesSelected(selectedFiles);
     if (inputRef.current) {
       inputRef.current.value = "";
     }
