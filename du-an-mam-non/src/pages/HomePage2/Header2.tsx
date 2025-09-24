@@ -106,6 +106,7 @@ const Header2 = () => {
               className="xl:hidden text-[#0BA6DF] hover:text-[#F97A00] transition"
               onClick={() => setMenuOpen(true)}
             >
+
               <Menu size={28} />
             </button>
           </div>
@@ -119,7 +120,6 @@ const Header2 = () => {
             className="absolute inset-0 bg-black/40"
             onClick={() => setMenuOpen(false)}
           ></div>
-
           <div className="absolute right-0 top-0 h-full w-2/3 sm:w-1/3 bg-white shadow-xl flex flex-col p-6 z-[60]">
             <button
               className="mb-6 self-end text-gray-600 hover:text-red-500"
@@ -137,6 +137,7 @@ const Header2 = () => {
                 >
                   {item.label}
                 </Link>
+
               ))}
 
               {/* Search mobile */}
@@ -144,6 +145,7 @@ const Header2 = () => {
                 onSubmit={handleSearch}
                 className="flex items-center gap-2 mt-6"
               >
+
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <input

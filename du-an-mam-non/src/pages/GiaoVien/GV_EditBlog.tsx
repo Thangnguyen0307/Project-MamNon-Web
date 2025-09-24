@@ -6,7 +6,7 @@ import ComponentCard from "../../components/common/ComponentCard";
 import FileInput from "../../components/form/input/FileInput";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../utils/axiosInstance";
-import { API_PATHS } from "../../utils/apiPaths";
+import { API_PATHS, BASE_URL_MEDIA } from "../../utils/apiPaths";
 import { AxiosError } from "axios";
 import Button from "../../components/ui/button/Button";
 import toast from "react-hot-toast";
@@ -73,7 +73,7 @@ const GV_EditBlog = () => {
     }));
   };
 
-  const handleFileChange = (files: FileList | null) => {
+  const handleFileChange = (files: File[] | null) => {
     if (!files) return;
     const selected = Array.from(files);
     console.log(selected);
@@ -88,7 +88,7 @@ const GV_EditBlog = () => {
     }
   };
 
-  const handleVideoChange = async (files: FileList | null) => {
+  const handleVideoChange = async (files: File[] | null) => {
     if (!files) return;
 
     const selectedVideos = Array.from(files)
@@ -301,7 +301,7 @@ const GV_EditBlog = () => {
                   key={index}
                   className="relative w-full aspect-square border rounded-lg overflow-hidden">
                   <img
-                    src={`https://techleaf.pro/projects/mam-non-media${file}`}
+                    src={`${BASE_URL_MEDIA}${file}`}
                     alt={`preview-${index}`}
                     className="w-full h-full object-cover"
                   />
@@ -332,7 +332,7 @@ const GV_EditBlog = () => {
                 {blogData.videos.map((video, index) => (
                   <div key={index} className="relative">
                     <VideoPlayer
-                      src={`https://techleaf.pro/projects/mam-non-media${video.m3u8}`}
+                      src={`${BASE_URL_MEDIA}${video.m3u8}`}
                       controls
                       className="w-full h-40 object-cover rounded-lg shadow"
                     />
@@ -367,7 +367,7 @@ const GV_EditBlog = () => {
                 {blogData.videosRemove?.map((video, index) => (
                   <div key={index} className="relative">
                     <VideoPlayer
-                      src={`https://techleaf.pro/projects/mam-non-media${video.m3u8}`}
+                      src={`${BASE_URL_MEDIA}${video.m3u8}`}
                       controls
                       className="w-full h-40 object-cover rounded-lg shadow"
                     />

@@ -6,6 +6,7 @@ interface ModalProps {
   limit?: number;
   current: number;
   setPage: (key: string, value: number) => void;
+  removeBorder?: boolean;
 }
 
 const Pagination: React.FC<ModalProps> = ({
@@ -13,6 +14,7 @@ const Pagination: React.FC<ModalProps> = ({
   limit = 10,
   setPage,
   current,
+  removeBorder,
 }) => {
   const {
     currentPage,
@@ -27,7 +29,10 @@ const Pagination: React.FC<ModalProps> = ({
 
   return (
     <>
-      <div className="flex flex-col items-center justify-between border-t border-gray-200 px-5 py-4 sm:flex-row dark:border-gray-800">
+      <div
+        className={`flex flex-col items-center justify-between ${
+          removeBorder ? "" : "border-t"
+        } border-gray-200 px-5 py-4 sm:flex-row dark:border-gray-800`}>
         <div className="pb-3 sm:pb-0">
           <span className="block text-sm font-medium text-gray-500 dark:text-gray-400">
             Từ
@@ -61,12 +66,10 @@ const Pagination: React.FC<ModalProps> = ({
               </svg>
             </span>
           </button>
-
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <ul className="hidden items-center gap-0.5 sm:flex">
-              <li>
+          <ul className="hidden items-center gap-0.5 sm:flex">
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <li key={index}>
                 <a
-                  key={index}
                   onClick={() => goToPage(index + 1)}
                   className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-medium ${
                     index + 1 === currentPage
@@ -76,8 +79,8 @@ const Pagination: React.FC<ModalProps> = ({
                   <span>{index + 1}</span>
                 </a>
               </li>
-            </ul>
-          ))}
+            ))}
+          </ul>
 
           <button
             onClick={() => nextPage()}

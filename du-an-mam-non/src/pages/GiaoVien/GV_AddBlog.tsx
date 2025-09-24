@@ -49,19 +49,19 @@ const GV_AddBlog = () => {
       [key]: value,
     }));
   };
-  const handleFileChange = (files: FileList | null) => {
-    if (!files) return;
-    const selected = Array.from(files);
-    if (blogData.images?.length >= 10) {
-      toast.error("Vui lòng chọn tối đa 10 ảnh!!");
-    } else {
-      setBlogData((prev) => ({
-        ...prev,
-        images: [...prev.images, ...selected],
-      }));
-    }
-  };
 
+  const handleFileChange = (files: File[]) => {
+    if (!files || files.length === 0) return;
+    const remainingSlots = 10 - (blogData.images?.length ?? 0);
+    const selected = files.slice(0, remainingSlots);
+    if (selected.length < files.length) {
+      toast.error("Vui lòng chọn tối đa 10 ảnh!!");
+    }
+    setBlogData((prev) => ({
+      ...prev,
+      images: [...prev.images, ...selected],
+    }));
+  };
   const createInit = async () => {
     const response = await axiosInstance.post(API_PATHS.VIDEO.INIT_VIDEO, {});
     return response.data.data._id;
@@ -87,7 +87,7 @@ const GV_AddBlog = () => {
     );
   };
 
-  const handleVideoChange = async (files: FileList | null) => {
+  const handleVideoChange = async (files: File[] | null) => {
     if (!files) return;
 
     const selectedVideos = Array.from(files)
