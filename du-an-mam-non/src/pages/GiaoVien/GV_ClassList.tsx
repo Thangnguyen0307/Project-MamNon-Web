@@ -65,17 +65,21 @@ export const GV_ClassList = () => {
 
   return (
     <div>
-      <p
-        className="text-center pt-5
-        text-3xl font-medium text-3xl font-bold text-[#fcb900]
-        transition-all duration-500 cursor-pointer 
-        hover:scale-110 
-        hover:text-transparent hover:bg-clip-text 
-        hover:bg-gradient-to-r hover:from-pink-400 hover:via-yellow-400 hover:to-green-400
-        drop-shadow-md 
-      ">
-        DANH SÁCH LỚP HỌC
-      </p>
+      <div className="text-center mb-16">
+        <div className="inline-block animate-bounce mb-4">
+          <span className="text-5xl">👥</span>
+        </div>
+        <h2 className="text-3xl md:text-4xl font-bold text-[#6c2bd9] mb-4 animate-fade-in-up">
+          DANH SÁCH LỚP HỌC
+        </h2>
+        <div className="mx-auto h-1 w-20 rounded-full bg-gradient-to-r from-[#88CE58] to-[#6c2bd9] animate-pulse mb-6"></div>
+        <p
+          className="text-lg text-gray-600 max-w-2xl mx-auto animate-fade-in-up"
+          style={{ animationDelay: "200ms" }}>
+          Dưới đây là danh sách các lớp học mà giáo viên đang phụ trách. Vui
+          lòng chọn lớp để thêm cũng như theo dõi bài viết.
+        </p>
+      </div>
       <div className="">
         <div className="max-w-5xl mx-auto px-4 py-10">
           {classesData?.length > 0 ? (

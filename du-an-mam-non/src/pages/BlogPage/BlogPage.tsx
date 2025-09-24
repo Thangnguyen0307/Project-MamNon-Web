@@ -9,7 +9,7 @@ const BlogPage = () => {
       {/* Header và Landing section */}
       <div className="pt-[80px]">
         <Header2 />
-        <Landing heightLanding="250px" />
+        <Landing />
         <BlogsCarousel limit={6} />
         <Footer />
       </div>
