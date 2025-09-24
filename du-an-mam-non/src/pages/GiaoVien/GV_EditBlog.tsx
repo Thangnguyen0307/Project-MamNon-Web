@@ -255,13 +255,13 @@ const GV_EditBlog = () => {
           ),
           { duration: Infinity }
         );
+        navigate(`/giaovien/baiviet/${classId}`);
       }
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       toast.error(err.response?.data?.message || "Lỗi khi cập nhật bài viết");
     } finally {
       setMount(false);
-      navigate(`/giaovien/baiviet/${classId}`);
     }
   };
 

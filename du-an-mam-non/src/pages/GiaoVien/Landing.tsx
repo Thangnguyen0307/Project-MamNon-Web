@@ -6,7 +6,7 @@ const slides = [
   "/images/homepage/slide3.jpg",
 ];
 
-const HEADER_HEIGHT = 300; // px
+const HEADER_HEIGHT = 400; // px
 
 const Landing = () => {
   const [current, setCurrent] = useState(0);
