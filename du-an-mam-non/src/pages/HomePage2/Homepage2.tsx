@@ -1,5 +1,6 @@
 import About from "./About";
 import Footer from "./Footer2";
+import GoogleMap from "./GGMap";
 import Header2 from "./Header2";
 import Landing from "./Landing";
 import TeachersCarousel from "./TeachersCarousel";
@@ -13,6 +14,7 @@ const Homepage2 = () => {
         <Landing />
         <About />
         <TeachersCarousel limit={4} />
+        <GoogleMap />
         <Footer />
       </div>
     </div>
