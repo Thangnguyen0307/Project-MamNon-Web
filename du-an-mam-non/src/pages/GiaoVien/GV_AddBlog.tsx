@@ -62,6 +62,7 @@ const GV_AddBlog = () => {
       images: [...prev.images, ...selected],
     }));
   };
+
   const createInit = async () => {
     const response = await axiosInstance.post(API_PATHS.VIDEO.INIT_VIDEO, {});
     return response.data.data._id;

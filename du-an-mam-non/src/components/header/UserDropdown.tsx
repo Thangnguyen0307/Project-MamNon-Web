@@ -164,9 +164,15 @@ export default function UserDropdown() {
               strokeLinejoin="round"
             />
           </svg>
-          <span className="ml-3 overflow-hidden rounded-full h-11 w-11">
-            <img src={`${BASE_URL_MEDIA}${user?.avatarUrl}`} alt="User" />
-          </span>
+          {user?.avatarUrl ? (
+            <span className="ml-3 overflow-hidden rounded-full h-11 w-11">
+              <img src={`${BASE_URL_MEDIA}${user?.avatarUrl}`} alt="User" />
+            </span>
+          ) : (
+            <span className="ml-3 overflow-hidden rounded-full h-11 w-11">
+              <img src={"/images/user/avt-user.png"} alt="User" />
+            </span>
+          )}
         </button>
 
         <Dropdown

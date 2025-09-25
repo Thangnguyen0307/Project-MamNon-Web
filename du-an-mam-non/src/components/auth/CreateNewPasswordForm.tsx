@@ -8,10 +8,11 @@ import { validateEmail } from "../../utils/helper";
 import { API_PATHS } from "../../utils/apiPaths";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { AxiosError } from "axios";
+import OTPInput from "../form/input/OtpInput";
 
 export default function CreateNewPasswordForm() {
   const [email, setEmail] = useState("");
-  const [otpCode, setotpCode] = useState("");
+  const [otpCode, setOtpCode] = useState("");
   const [newPassword, setnewPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +23,12 @@ export default function CreateNewPasswordForm() {
     e.preventDefault();
 
     if (!validateEmail(email)) {
-      setError("Please enter a valid email address");
+      setError("Vui lòng nhập email đúng định dạng abc@xyz.com");
+      return;
+    }
+
+    if (otpCode.length !== 6 || !/^\d{6}$/.test(otpCode)) {
+      setError("Vui lòng nhập đủ 6 số OTP!");
       return;
     }
 
@@ -70,7 +76,7 @@ export default function CreateNewPasswordForm() {
           <div>
             <form onSubmit={handleLogin}>
               <div className="space-y-6">
-                <div>
+                <div className="mb-2">
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}
                   </Label>
@@ -78,17 +84,14 @@ export default function CreateNewPasswordForm() {
                     placeholder="info@gmail.com"
                     value={email}
                     onChange={({ target }) => setEmail(target.value)}
+                    required
                   />
                 </div>
-                <div>
+                <div className="mb-2">
                   <Label>
                     OTP Code <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input
-                    placeholder="info@gmail.com"
-                    value={otpCode}
-                    onChange={({ target }) => setotpCode(target.value)}
-                  />
+                  <OTPInput onChange={setOtpCode} />
                 </div>
                 <div>
                   <Label>
@@ -100,6 +103,7 @@ export default function CreateNewPasswordForm() {
                       placeholder="Nhập mật khẩu mới"
                       value={newPassword}
                       onChange={({ target }) => setnewPassword(target.value)}
+                      required
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
