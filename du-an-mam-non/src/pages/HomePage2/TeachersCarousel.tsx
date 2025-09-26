@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import { axiosInstance } from "../../utils/axiosInstance";
+import { BASE_URL_MEDIA } from "../../utils/apiPaths";
 
 type ApiTeacher = {
   id: string;
   fullName: string;
   role: string;
   isActive: boolean;
+  avatarUrl?: string | null;
 };
 
 type Props = {
@@ -17,7 +19,25 @@ type Props = {
   bg?: string; // cho phép truyền màu nền section
 };
 
-const FALLBACK_AVATAR = "/images/carousel/carousel-04.png";
+const FALLBACK_AVATAR = "/images/user/userDefault.jpg";
+
+// Function to get avatar URL with fallback
+const getAvatarUrl = (avatarUrl?: string | null): string => {
+  if (!avatarUrl) return FALLBACK_AVATAR;
+
+  // If avatarUrl starts with /, prepend the media base URL
+  if (avatarUrl.startsWith("/")) {
+    return `${BASE_URL_MEDIA}${avatarUrl}`;
+  }
+
+  // If it's a full URL, return as is
+  if (avatarUrl.startsWith("http")) {
+    return avatarUrl;
+  }
+
+  // Otherwise, treat as relative path and prepend media URL
+  return `${BASE_URL_MEDIA}/${avatarUrl}`;
+};
 
 export default function TeachersCarousel({
   title = "ĐỘI NGŨ GIÁO VIÊN",
@@ -155,19 +175,6 @@ export default function TeachersCarousel({
                       }
                     }}
                   >
-                    {/* Floating badge */}
-                    <div className="absolute top-3 right-3 z-10 animate-bounce-gentle">
-                      <div
-                        className={`rounded-full px-2 py-1 text-[10px] font-medium shadow-lg backdrop-blur-sm ${
-                          t.isActive
-                            ? "bg-green-100/90 text-green-700 border border-green-200"
-                            : "bg-gray-100/90 text-gray-600 border border-gray-200"
-                        }`}
-                      >
-                        {t.isActive ? "✨ Active" : "⏸️ Paused"}
-                      </div>
-                    </div>
-
                     {/* Image container with enhanced effects */}
                     <div className="aspect-[3/4] overflow-hidden rounded-t-2xl teacher-bg-gradient relative">
                       {/* Decorative floating elements */}
@@ -178,10 +185,13 @@ export default function TeachersCarousel({
                       </div>
 
                       <img
-                        src={FALLBACK_AVATAR}
+                        src={getAvatarUrl(t.avatarUrl)}
                         alt={t.fullName}
                         className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110 animate-float"
                         loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = FALLBACK_AVATAR;
+                        }}
                       />
 
                       {/* Magic sparkle overlay on hover */}
@@ -261,13 +271,8 @@ export default function TeachersCarousel({
                       </span>
                     </div>
 
-                    {/* Enhanced border hover effect với click indicator */}
+                    {/* Enhanced border hover effect */}
                     <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-[#88CE58] group-hover:to-[#6c2bd9] transition-all duration-500 pointer-events-none opacity-0 group-hover:opacity-50"></div>
-
-                    {/* Click indicator */}
-                    <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                      👆 Click để xem thêm
-                    </div>
                   </article>
                 </SwiperSlide>
               ))}
