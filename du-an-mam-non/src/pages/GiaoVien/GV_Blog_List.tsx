@@ -661,7 +661,7 @@ const GV_Blog_List: React.FC = () => {
                   }}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-x-6 gap-y-2">
                 <ComponentCard title="Thêm hình ảnh">
                   <div>
                     <Label>Chọn file hình ảnh</Label>

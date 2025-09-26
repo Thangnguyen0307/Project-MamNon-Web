@@ -15,8 +15,6 @@ import { Toaster } from "react-hot-toast";
 import { GVHomePage } from "./pages/GiaoVien/GVHomePage";
 import { GV_ClassList } from "./pages/GiaoVien/GV_ClassList";
 import GV_Blog_List from "./pages/GiaoVien/GV_Blog_List";
-import GV_AddBlog from "./pages/GiaoVien/GV_AddBlog";
-import GV_EditBlog from "./pages/GiaoVien/GV_EditBlog";
 import Homepage2 from "./pages/HomePage2/Homepage2";
 import TeachersPage from "./pages/TeacherPage/TeachersPage";
 import BlogPage from "./pages/BlogPage/BlogPage";
@@ -45,11 +43,6 @@ export default function App() {
             <Route path="/giaovien" element={<GVHomePage />}>
               <Route index element={<GV_ClassList />} />
               <Route path="baiviet/:classId" element={<GV_Blog_List />} />
-              <Route path="thembaiviet/:classId" element={<GV_AddBlog />} />
-              <Route
-                path="chinhsuabaiviet/:classId/:blogId"
-                element={<GV_EditBlog />}
-              />
             </Route>
           </Route>
           {/* HomePage   */}
