@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
 import { Search, Menu, X } from "lucide-react";
+import { Link } from "react-router";
 
 const navItems = [
-  { label: "TRANG CHỦ", color: "text-[#6C4CD6]" },
-  { label: "LỚP HỌC", color: "text-[#EB397A]" },
-  { label: "ĐỘI NGŨ GIÁO VIÊN", color: "text-[#88CE58]" },
-  { label: "TIN TỨC", color: "text-[#0BA6DF]" },
-  { label: "LIÊN HỆ", color: "text-[#F97A00]" },
+  { label: "TRANG CHỦ", color: "text-[#6C4CD6]", path: "/" },
+  { label: "LỚP HỌC", color: "text-[#EB397A]", path: "/lop-hoc" },
+  {
+    label: "ĐỘI NGŨ GIÁO VIÊN",
+    color: "text-[#88CE58]",
+    path: "/doi-ngu-giao-vien",
+  },
+  { label: "TIN TỨC", color: "text-[#0BA6DF]", path: "/tin-tuc" },
+  { label: "LIÊN HỆ", color: "text-[#F97A00]", path: "/lien-he" },
 ];
 
 const Header2 = () => {
@@ -37,7 +42,8 @@ const Header2 = () => {
           isScrolled
             ? "top-4 shadow-2xl backdrop-blur-lg"
             : "top-0 bg-white shadow-lg"
-        }`}>
+        }`}
+      >
         <div className={navClass}>
           <div className="w-full flex items-center justify-between h-full px-5 xl:px-10">
             {/* Logo */}
@@ -62,19 +68,21 @@ const Header2 = () => {
             {/* Desktop nav */}
             <nav className="hidden lg:flex items-center gap-8 h-full">
               {navItems.map((item) => (
-                <a
+                <Link
                   key={item.label}
-                  href="#"
-                  className={`font-bold text-base uppercase ${item.color} hover:underline`}>
+                  to={item.path}
+                  className={`font-bold text-base uppercase ${item.color} hover:underline`}
+                >
                   {item.label}
-                </a>
+                </Link>
               ))}
             </nav>
 
             {/* Search desktop (>=1280px) */}
             <form
               onSubmit={handleSearch}
-              className="hidden xl:flex items-center gap-2 ml-4">
+              className="hidden xl:flex items-center gap-2 ml-4"
+            >
               <div className="relative w-[250px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <input
@@ -87,7 +95,8 @@ const Header2 = () => {
               </div>
               <button
                 type="submit"
-                className="inline-flex items-center h-11 px-4 text-sm font-medium text-white bg-[#0BA6DF] rounded-lg hover:bg-[#F97A00] transition">
+                className="inline-flex items-center h-11 px-4 text-sm font-medium text-white bg-[#0BA6DF] rounded-lg hover:bg-[#F97A00] transition"
+              >
                 <Search className="w-4 h-4 mr-2" /> Tìm
               </button>
             </form>
@@ -95,7 +104,9 @@ const Header2 = () => {
             {/* Mobile & tablet menu button */}
             <button
               className="xl:hidden text-[#0BA6DF] hover:text-[#F97A00] transition"
-              onClick={() => setMenuOpen(true)}>
+              onClick={() => setMenuOpen(true)}
+            >
+
               <Menu size={28} />
             </button>
           </div>
@@ -107,29 +118,34 @@ const Header2 = () => {
         <div className="fixed inset-0 z-[60]">
           <div
             className="absolute inset-0 bg-black/40"
-            onClick={() => setMenuOpen(false)}></div>
-
+            onClick={() => setMenuOpen(false)}
+          ></div>
           <div className="absolute right-0 top-0 h-full w-2/3 sm:w-1/3 bg-white shadow-xl flex flex-col p-6 z-[60]">
             <button
               className="mb-6 self-end text-gray-600 hover:text-red-500"
-              onClick={() => setMenuOpen(false)}>
+              onClick={() => setMenuOpen(false)}
+            >
               <X size={28} />
             </button>
             <nav className="flex flex-col gap-6 font-bold text-lg">
               {navItems.map((item) => (
-                <a
+                <Link
                   key={item.label}
-                  href="#"
+                  to={item.path}
                   onClick={() => setMenuOpen(false)}
-                  className={`${item.color} uppercase hover:underline`}>
+                  className={`${item.color} uppercase hover:underline`}
+                >
                   {item.label}
-                </a>
+                </Link>
+
               ))}
 
               {/* Search mobile */}
               <form
                 onSubmit={handleSearch}
-                className="flex items-center gap-2 mt-6">
+                className="flex items-center gap-2 mt-6"
+              >
+
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <input
@@ -142,7 +158,8 @@ const Header2 = () => {
                 </div>
                 <button
                   type="submit"
-                  className="inline-flex items-center h-11 px-4 text-sm font-medium text-white bg-[#0BA6DF] rounded-lg hover:bg-[#F97A00] transition">
+                  className="inline-flex items-center h-11 px-4 text-sm font-medium text-white bg-[#0BA6DF] rounded-lg hover:bg-[#F97A00] transition"
+                >
                   <Search className="w-4 h-4 mr-2" /> Tìm
                 </button>
               </form>

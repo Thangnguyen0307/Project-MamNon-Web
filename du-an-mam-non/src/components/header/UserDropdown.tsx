@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { useUser } from "../../context/UserContext";
 import { axiosInstance } from "../../utils/axiosInstance";
-import { API_PATHS } from "../../utils/apiPaths";
+import { API_PATHS, BASE_URL_MEDIA } from "../../utils/apiPaths";
 import { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { Modal } from "../ui/modal";
@@ -12,6 +12,8 @@ import { EyeIcon, KeyRound, PencilLine, Trash } from "lucide-react";
 import { EyeCloseIcon } from "../../icons";
 import { useModal } from "../../hooks/useModal";
 import Button from "../ui/button/Button";
+import ComponentCard from "../common/ComponentCard";
+import FileInput from "../form/input/FileInput";
 
 export default function UserDropdown() {
   const [isOpenDropDown, setIsOpenDropDown] = useState(false);
@@ -20,6 +22,7 @@ export default function UserDropdown() {
   const [typeModal, setTypeModal] = useState<string>("");
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [avtFile, setAvtFile] = useState<File | null>(null);
   const [paramsUserInfo, setParamsUserInfo] = useState({
     fullName: user?.fullName,
     email: user?.email,
@@ -39,8 +42,22 @@ export default function UserDropdown() {
         const response = await axiosInstance.put(API_PATHS.USER.UPDATE_USER, {
           fullName: paramsUserInfo.fullName,
         });
+        let responseAvt;
+        if (avtFile) {
+          const formData = new FormData();
+          formData.append("images", avtFile);
+          responseAvt = await axiosInstance.post(
+            API_PATHS.IMAGES.UPLOAD_AVT,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+        }
 
-        if (response.data) {
+        if (response.data && (!avtFile || responseAvt?.data)) {
           updateUser({
             ...user!,
             fullName: response.data.fullName,
@@ -100,6 +117,11 @@ export default function UserDropdown() {
     setIsOpenDropDown(false);
   }
 
+  const handleFileChange = (files: File[] | null) => {
+    if (!files || files.length === 0) return;
+    setAvtFile(files[0]);
+  };
+
   const handleLogOut = async () => {
     try {
       const response = await axiosInstance.post(API_PATHS.AUTH.LOG_OUT, {
@@ -142,9 +164,15 @@ export default function UserDropdown() {
               strokeLinejoin="round"
             />
           </svg>
-          <span className="ml-3 overflow-hidden rounded-full h-11 w-11">
-            <img src="/images/user/owner.jpg" alt="User" />
-          </span>
+          {user?.avatarUrl ? (
+            <span className="ml-3 overflow-hidden rounded-full h-11 w-11">
+              <img src={`${BASE_URL_MEDIA}${user?.avatarUrl}`} alt="User" />
+            </span>
+          ) : (
+            <span className="ml-3 overflow-hidden rounded-full h-11 w-11">
+              <img src={"/images/user/avt-user.png"} alt="User" />
+            </span>
+          )}
         </button>
 
         <Dropdown
@@ -236,6 +264,35 @@ export default function UserDropdown() {
                           handleValueChange(target.name, target.value);
                         }}
                       />
+                      <div className="mt-5">
+                        <ComponentCard title="Hình ảnh">
+                          <div>
+                            <Label>Chọn file hình ảnh</Label>
+                            <FileInput
+                              onFilesSelected={handleFileChange}
+                              className="custom-class"
+                              multiple
+                            />
+                          </div>
+                        </ComponentCard>
+                        {avtFile && (
+                          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 gap-3 mt-2">
+                            <div className="relative w-full aspect-square border rounded-lg overflow-hidden">
+                              <img
+                                src={URL.createObjectURL(avtFile)}
+                                className="w-full h-full object-cover"
+                              />
+                              {/* Nút xóa */}
+                              <button
+                                type="button"
+                                onClick={() => setAvtFile(null)}
+                                className="absolute top-1 right-1 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                                X
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ) : typeModal === "updatepassword" ? (
                     <div>

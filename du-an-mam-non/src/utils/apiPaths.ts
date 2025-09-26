@@ -1,4 +1,5 @@
 export const BASE_URL = "https://techleaf.pro/projects/mam-non-media/";
+export const BASE_URL_MEDIA = "https://techleaf.pro/projects/mam-non-media";
 
 export const API_PATHS = {
   AUTH: {
@@ -48,5 +49,8 @@ export const API_PATHS = {
   VIDEO: {
     INIT_VIDEO: "api/videos/init",
     UPLOAD_CHUNK: (id: string) => `api/videos/${id}/chunk`,
+  },
+  IMAGES: {
+    UPLOAD_AVT: "api/images/upload",
   },
 };

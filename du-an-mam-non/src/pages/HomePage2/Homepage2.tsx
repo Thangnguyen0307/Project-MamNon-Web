@@ -4,6 +4,7 @@ import GoogleMap from "./GGMap";
 import Header2 from "./Header2";
 import Landing from "./Landing";
 import TeachersCarousel from "./TeachersCarousel";
+import ClassCarousel from "../ClassPage/ClassCarousel";
 
 const Homepage2 = () => {
   return (
@@ -15,6 +16,7 @@ const Homepage2 = () => {
         <About />
         <TeachersCarousel limit={4} />
         <GoogleMap />
+        <ClassCarousel limit={4} />
         <Footer />
       </div>
     </div>
