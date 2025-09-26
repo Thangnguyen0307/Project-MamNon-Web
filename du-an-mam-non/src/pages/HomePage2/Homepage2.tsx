@@ -15,8 +15,8 @@ const Homepage2 = () => {
         <Landing />
         <About />
         <TeachersCarousel limit={4} />
-        <GoogleMap />
         <ClassCarousel limit={4} />
+        <GoogleMap />
         <Footer />
       </div>
     </div>
